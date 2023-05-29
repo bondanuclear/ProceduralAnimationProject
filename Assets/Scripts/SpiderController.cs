@@ -12,6 +12,7 @@ public class SpiderController : MonoBehaviour
     [Header("Main body control: ")]
     [SerializeField] float speed = 5;
     [SerializeField] float distanceFromGround;
+    [SerializeField] Transform centerOfRotation;
     [Header("Parameters of the second order system: ")]
     [SerializeField] float f;
     [SerializeField] float z;
