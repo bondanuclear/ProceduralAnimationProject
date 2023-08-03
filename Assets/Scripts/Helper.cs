@@ -5,7 +5,7 @@ using UnityEngine;
 public class Helper : MonoBehaviour
 {
     
-    [SerializeField]Transform target;
+    [SerializeField] Transform target;
     [SerializeField] float f;
     [SerializeField] float z;
     [SerializeField] float r;

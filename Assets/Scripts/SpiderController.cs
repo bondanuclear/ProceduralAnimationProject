@@ -13,6 +13,7 @@ public class SpiderController : MonoBehaviour
     [SerializeField] float speed = 5;
     [SerializeField] float distanceFromGround;
     [SerializeField] Transform centerOfRotation;
+    [SerializeField] float rotatingSpeed = 4f;
     [Header("Parameters of the second order system: ")]
     [SerializeField] float f;
     [SerializeField] float z;
@@ -26,7 +27,9 @@ public class SpiderController : MonoBehaviour
         instance = new SecondOrderDynamics(f,z,r, transform.position);
         targetMovePos = transform.position;
     }
-    private void Update() {
+    private void Update() 
+    {
+        
         if (Input.GetKey(KeyCode.W)) 
         {
             
@@ -39,12 +42,14 @@ public class SpiderController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.A)) 
         {
-            
+            //centerOfRotation.eulerAngles -= new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
+            //transform.eulerAngles -= new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
             targetMovePos.x -= Time.deltaTime * speed;
         }
         else if (Input.GetKey(KeyCode.D)) 
         {
-            
+            //centerOfRotation.eulerAngles += new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
+            //transform.eulerAngles += new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
             targetMovePos.x += Time.deltaTime * speed;
         }
         if (Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit info, rayLength, layerMask))
