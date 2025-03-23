@@ -1,16 +1,10 @@
 using UnityEngine;
 
-public class StateMachine : MonoBehaviour
+namespace Modules.Infrastructure.StateMachine
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class StateMachine : MonoBehaviour
     {
-        
+    
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
