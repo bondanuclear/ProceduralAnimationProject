@@ -16,12 +16,12 @@ namespace Modules.Infrastructure.StateMachine
 
         [Header("Physics")]
         [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private Collider _collider;
+        [SerializeField] private CapsuleCollider _collider;
         private EnvironmentInteractionContext _context;
         private void Awake() {
             ValidateConstraints();
             _context = new EnvironmentInteractionContext(_leftIKConstraint, 
-                        _rightIKConstraint,_leftMultiRotationConstraint,_rightMultiRotationConstraint, _rigidbody, _collider);
+                        _rightIKConstraint,_leftMultiRotationConstraint,_rightMultiRotationConstraint, _rigidbody, _collider, transform.root);
             InitializeStates();
         }
         private void ValidateConstraints()
@@ -40,6 +40,14 @@ namespace Modules.Infrastructure.StateMachine
             _states.Add(EEnvironmentInteractionState.Rise, new RiseState(_context, EEnvironmentInteractionState.Rise));
             _states.Add(EEnvironmentInteractionState.Touch, new TouchState(_context, EEnvironmentInteractionState.Touch));
             _currentState = _states[EEnvironmentInteractionState.Reset];
+        }
+        private void ConstructDetectionCollider()
+        {
+            float wingspan = _collider.height;
+            BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+            boxCollider.size = new Vector3(wingspan, wingspan, wingspan);   
+            boxCollider.center = new Vector3(_collider.center.x, _collider.center.y + (wingspan*0.25f), _collider.center.z + (wingspan*0.5f));
+            boxCollider.isTrigger = true;
         }
     }
 }
