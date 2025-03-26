@@ -4,13 +4,15 @@ namespace Modules.Infrastructure.States
 {
     public abstract class BaseState<TState> where TState : Enum
     {
+       
         public BaseState(TState key)
         {
+            // Debug.Log("Called BaseState constructor");
             StateKey = key;
         }
         public TState StateKey {
-            get {return StateKey;}
-            private set {StateKey = value;}
+            get;
+            private set;
         }
         public abstract void EnterState();
         public abstract void ExitState();

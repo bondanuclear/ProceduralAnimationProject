@@ -10,9 +10,10 @@ namespace Modules.Infrastructure.States
     {
         private const string InteractableLayer = "Interactable";
         protected EnvironmentInteractionContext _context;
-        public EnvironmentInteractionState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(stateKey)
+        public EnvironmentInteractionState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(stateKey)
         {
-            _context = environmentInteractionContext;
+            Debug.Log("Called EnvironmentInteractionState constructor with ");
+            _context = context;
         }
 
         public override void EnterState()

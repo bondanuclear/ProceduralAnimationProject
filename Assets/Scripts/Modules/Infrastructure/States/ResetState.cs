@@ -4,33 +4,23 @@ namespace Modules.Infrastructure.States
 {
     public class ResetState : EnvironmentInteractionState
     {
-        public ResetState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(environmentInteractionContext, stateKey)
+        public ResetState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(context, stateKey)
         {
-            
+            //Debug.Log("Called ResetState constructor!");
+            EnvironmentInteractionContext _context = context;
+        }
+        public override void EnterState()
+        {
+            Debug.Log("Entered Reset State");
         }
         public override void UpdateState()
         {
-
-        }
-        public override void ExitState()
-        {
-            
+            Debug.Log("Updating reset state!");
         }
         public override EEnvironmentInteractionState GetNextState()
         {
             return StateKey;
         }
-        public override void OnTriggerEnter(Collider other)
-        {
-            
-        }
-        public override void OnTriggerStay(Collider other)
-        {
-            
-        }
-        public override void OnTriggerExit(Collider other)
-        {
-            
-        }
+       
     }
 }

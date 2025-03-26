@@ -12,6 +12,7 @@ public class EnvironmentInteractionContext
     private Transform _rootTransform;
     public EnvironmentInteractionContext(TwoBoneIKConstraint leftIKConstraint, TwoBoneIKConstraint rightIKConstraint, MultiRotationConstraint leftMultiRotationConstraint, MultiRotationConstraint rightMultiRotationConstraint, Rigidbody rigidbody, Collider collider, Transform rootTransform)
     {
+        //Debug.Log("Called EnvironmentInteractionContext constructor!");
         LeftIKConstraint = leftIKConstraint;
         RightIKConstraint = rightIKConstraint;
         LeftMultiRotationConstraint = leftMultiRotationConstraint;

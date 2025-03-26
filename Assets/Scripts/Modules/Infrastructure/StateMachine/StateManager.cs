@@ -15,6 +15,7 @@ namespace Modules.Infrastructure.States
         protected BaseState<TState> _currentState;
         protected bool _isTransitioningState;
         void Start() {
+            //Debug.Log("Current state is " + _currentState.GetType().Name);
             _currentState.EnterState();
         }
         void Update() {

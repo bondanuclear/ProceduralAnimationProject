@@ -34,6 +34,7 @@ namespace Modules.Infrastructure.StateMachine
         private void InitializeStates()
         {
             // add states to inherited State Manager "states" dictionary and set initial state
+            //Debug.Log("Called InitializeStates!");
             _states.Add(EEnvironmentInteractionState.Reset, new ResetState(_context, EEnvironmentInteractionState.Reset));
             _states.Add(EEnvironmentInteractionState.Search, new SearchState(_context, EEnvironmentInteractionState.Search));
             _states.Add(EEnvironmentInteractionState.Approach, new ApproachState(_context, EEnvironmentInteractionState.Approach));

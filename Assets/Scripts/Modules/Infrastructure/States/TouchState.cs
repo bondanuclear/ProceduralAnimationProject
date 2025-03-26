@@ -7,7 +7,7 @@ namespace Modules.Infrastructure.States
     private EEnvironmentInteractionState _stateKey;
     public TouchState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(environmentInteractionContext, stateKey)
     {
-       _stateKey = stateKey;
+       //_stateKey = stateKey;
     }
 }
 }

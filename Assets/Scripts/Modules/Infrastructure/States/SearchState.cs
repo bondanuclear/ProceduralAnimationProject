@@ -7,7 +7,7 @@ namespace Modules.Infrastructure.States
         private EEnvironmentInteractionState _stateKey;
         public SearchState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(environmentInteractionContext, stateKey)
         {
-            _stateKey = stateKey;
+            //_stateKey = stateKey;
         }
         public override EEnvironmentInteractionState GetNextState()
         {
