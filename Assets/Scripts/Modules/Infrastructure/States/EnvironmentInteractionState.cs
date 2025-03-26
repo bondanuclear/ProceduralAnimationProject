@@ -9,10 +9,10 @@ namespace Modules.Infrastructure.States
     public abstract class EnvironmentInteractionState : BaseState<EEnvironmentInteractionState>
     {
         private const string InteractableLayer = "Interactable";
-        protected EnvironmentInteractionContext _environmentInteractionContext;
+        protected EnvironmentInteractionContext _context;
         public EnvironmentInteractionState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(stateKey)
         {
-            _environmentInteractionContext = environmentInteractionContext;
+            _context = environmentInteractionContext;
         }
 
         public override void EnterState()
@@ -51,29 +51,39 @@ namespace Modules.Infrastructure.States
         }
         protected void StartIKTargetPositionTracking(Collider intersectingCollider)
         {
-            if(intersectingCollider.gameObject.layer == LayerMask.NameToLayer(InteractableLayer) && _environmentInteractionContext.CurrentIntersectingCollider == null)
+            if(intersectingCollider.gameObject.layer == LayerMask.NameToLayer(InteractableLayer) && _context.CurrentIntersectingCollider == null)
             {
-                _environmentInteractionContext.CurrentIntersectingCollider = intersectingCollider;
-                Vector3 closestPointFromRoot = GetClosestPointOnCollider(intersectingCollider, _environmentInteractionContext.RootTransform.position);
-                _environmentInteractionContext.SetCurrentSide(closestPointFromRoot);
+                _context.CurrentIntersectingCollider = intersectingCollider;
+                Vector3 closestPointFromRoot = GetClosestPointOnCollider(intersectingCollider, _context.RootTransform.position);
+                _context.SetCurrentSide(closestPointFromRoot);
+                SetIKTargetPosition();
             }
             
         }
         protected void ResetIKTargetPositionTracking(Collider intersectingCollider)
         {
-            if(_environmentInteractionContext.CurrentIntersectingCollider  == intersectingCollider)
+            if(intersectingCollider == _context.CurrentIntersectingCollider)
             {
-                _environmentInteractionContext.CurrentIntersectingCollider = null;
+                _context.CurrentIntersectingCollider = null;
+                _context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity; 
             }
         }
         protected void UpdateIKTargetPositionTracking(Collider intersectingCollider)
         {
-            
+            if(intersectingCollider != _context.CurrentIntersectingCollider)
+            {
+                SetIKTargetPosition();
+            }
         }
 
         private Vector3 GetClosestPointOnCollider(Collider intersectingCollider, Vector3 positionToCheck)
         {
             return intersectingCollider.ClosestPoint(positionToCheck);
+        }
+        private void SetIKTargetPosition()
+        {
+            _context.ClosestPointOnColliderFromShoulder = GetClosestPointOnCollider(_context.CurrentIntersectingCollider, 
+               new Vector3(_context.CurrentShoulderTransform.position.x, _context.CharacterShoulderHeight, _context.CurrentShoulderTransform.position.z) );
         }
     }
 }

@@ -21,5 +21,9 @@ namespace Modules.Infrastructure.States
         {
             ResetIKTargetPositionTracking(other);
         }
+        public override void OnTriggerStay(Collider other)
+        {
+            UpdateIKTargetPositionTracking(other);
+        }
     }
 }

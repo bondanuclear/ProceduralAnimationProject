@@ -19,6 +19,7 @@ public class EnvironmentInteractionContext
         _rigidbody = rigidbody;
         _collider = collider;
         _rootTransform = rootTransform;
+        CharacterShoulderHeight = leftIKConstraint.data.root.position.y;
     }
 
     public TwoBoneIKConstraint LeftIKConstraint { get => _leftIKConstraint; set => _leftIKConstraint = value; }
@@ -34,7 +35,8 @@ public class EnvironmentInteractionContext
     public Transform CurrentIKTargetTransform { get; private set; }
     public Transform CurrentShoulderTransform { get; private set; }
     public EBodySide CurrentBodySide { get; private set; }
-   
+    public Vector3 ClosestPointOnColliderFromShoulder { get; set; } = Vector3.positiveInfinity;
+    public float CharacterShoulderHeight { get; set; }
 
     public void SetCurrentSide(Vector3 positionToCheck)
     {

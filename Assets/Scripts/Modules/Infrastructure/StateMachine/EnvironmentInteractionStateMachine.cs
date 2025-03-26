@@ -49,5 +49,13 @@ namespace Modules.Infrastructure.StateMachine
             boxCollider.center = new Vector3(_collider.center.x, _collider.center.y + (wingspan*0.25f), _collider.center.z + (wingspan*0.5f));
             boxCollider.isTrigger = true;
         }
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            if(_context != null && _context.ClosestPointOnColliderFromShoulder != null)
+            {
+                Gizmos.DrawSphere(_context.ClosestPointOnColliderFromShoulder,.03f);
+            }
+        }
     }
 }
