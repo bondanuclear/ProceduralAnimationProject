@@ -12,44 +12,10 @@ namespace Modules.Infrastructure.States
         protected EnvironmentInteractionContext _context;
         public EnvironmentInteractionState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(stateKey)
         {
-            Debug.Log("Called EnvironmentInteractionState constructor with ");
+            //Debug.Log("Called EnvironmentInteractionState constructor with ");
             _context = context;
         }
 
-        public override void EnterState()
-        {
-            
-        }
-
-        public override void ExitState()
-        {
-            
-        }
-
-        public override EEnvironmentInteractionState GetNextState()
-        {
-            return StateKey;
-        }
-
-        public override void OnTriggerEnter(Collider other)
-        {
-            
-        }
-
-        public override void OnTriggerExit(Collider other)
-        {
-            
-        }
-
-        public override void OnTriggerStay(Collider other)
-        {
-           
-        }
-
-        public override void UpdateState()
-        {
-           
-        }
         protected void StartIKTargetPositionTracking(Collider intersectingCollider)
         {
             if(intersectingCollider.gameObject.layer == LayerMask.NameToLayer(InteractableLayer) && _context.CurrentIntersectingCollider == null)

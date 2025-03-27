@@ -9,6 +9,18 @@ namespace Modules.Infrastructure.States
             //Debug.Log("Called ResetState constructor!");
             EnvironmentInteractionContext _context = context;
         }
+        public override void OnTriggerEnter(Collider other)
+        {
+            Debug.Log("Touched a wall in reset state " + other.name);
+        }
+        public override void OnTriggerStay(Collider other)
+        {
+            Debug.Log("Touching a wall in reset state " + other.name);
+        }
+        public override void OnTriggerExit(Collider other)
+        {
+            Debug.Log("No longer touching interactable " + other.name );
+        }
         public override void EnterState()
         {
             Debug.Log("Entered Reset State");
@@ -21,6 +33,10 @@ namespace Modules.Infrastructure.States
         {
             return StateKey;
         }
-       
+
+        public override void ExitState()
+        {
+            Debug.Log("Exiting reset state");
+        }
     }
 }

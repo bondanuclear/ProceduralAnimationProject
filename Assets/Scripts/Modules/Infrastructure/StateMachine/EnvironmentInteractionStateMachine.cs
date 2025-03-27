@@ -23,6 +23,7 @@ namespace Modules.Infrastructure.StateMachine
             _context = new EnvironmentInteractionContext(_leftIKConstraint, 
                         _rightIKConstraint,_leftMultiRotationConstraint,_rightMultiRotationConstraint, _rigidbody, _collider, transform.root);
             InitializeStates();
+            ConstructDetectionCollider();
         }
         private void ValidateConstraints()
         {

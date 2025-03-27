@@ -14,7 +14,7 @@ namespace Modules.Infrastructure.States
         protected Dictionary<TState, BaseState<TState>> _states = new Dictionary<TState, BaseState<TState>>();
         protected BaseState<TState> _currentState;
         protected bool _isTransitioningState;
-        void Start() {
+        public void Start() {
             //Debug.Log("Current state is " + _currentState.GetType().Name);
             _currentState.EnterState();
         }
@@ -46,13 +46,13 @@ namespace Modules.Infrastructure.States
         _isTransitioningState = false;
         }
 
-        void OnTriggerEnter(Collider other){
+        private void OnTriggerEnter(Collider other){
             _currentState.OnTriggerEnter(other);
         }
-        void OnTriggerExit(Collider other){
+        private void OnTriggerExit(Collider other){
             _currentState.OnTriggerExit(other);
         }
-        void OnTriggerStay(Collider other) {
+        private void OnTriggerStay(Collider other) {
             _currentState.OnTriggerStay(other);
         }
     }

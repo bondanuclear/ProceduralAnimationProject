@@ -9,6 +9,20 @@ namespace Modules.Infrastructure.States
         {
             //_stateKey = stateKey;
         }
+
+        public override void EnterState()
+        {
+            
+        }
+
+        public override void ExitState()
+        {
+            
+        }
+        public override void UpdateState()
+        {
+            
+        }
         public override EEnvironmentInteractionState GetNextState()
         {
             return StateKey;
@@ -25,5 +39,7 @@ namespace Modules.Infrastructure.States
         {
             UpdateIKTargetPositionTracking(other);
         }
+
+        
     }
 }
