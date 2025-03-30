@@ -15,13 +15,14 @@ namespace Modules.Infrastructure.StateMachine
         [SerializeField] private MultiRotationConstraint _rightMultiRotationConstraint;
 
         [Header("Physics")]
-        [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private CapsuleCollider _collider;
+        //[SerializeField] private Rigidbody _rigidbody;
+        //[SerializeField] private CapsuleCollider _collider;
+        [SerializeField] private CharacterController _characterController;
         private EnvironmentInteractionContext _context;
         private void Awake() {
             ValidateConstraints();
             _context = new EnvironmentInteractionContext(_leftIKConstraint, 
-                        _rightIKConstraint,_leftMultiRotationConstraint,_rightMultiRotationConstraint, _rigidbody, _collider, transform.root);
+                        _rightIKConstraint,_leftMultiRotationConstraint,_rightMultiRotationConstraint, transform.root, _characterController);
             InitializeStates();
             ConstructDetectionCollider();
         }
@@ -45,10 +46,10 @@ namespace Modules.Infrastructure.StateMachine
         }
         private void ConstructDetectionCollider()
         {
-            float wingspan = _collider.height;
+            float wingspan = _characterController.height;
             BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
             boxCollider.size = new Vector3(wingspan, wingspan, wingspan);   
-            boxCollider.center = new Vector3(_collider.center.x, _collider.center.y + (wingspan*0.25f), _collider.center.z + (wingspan*0.5f));
+            boxCollider.center = new Vector3(_characterController.center.x, _characterController.center.y + (wingspan*0.25f), _characterController.center.z + (wingspan*0.5f));
             boxCollider.isTrigger = true;
         }
         private void OnDrawGizmosSelected()
