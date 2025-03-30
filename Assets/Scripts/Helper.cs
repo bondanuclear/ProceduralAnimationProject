@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Modules.Math;
 using UnityEngine;
 
 public class Helper : MonoBehaviour
@@ -14,6 +15,6 @@ public class Helper : MonoBehaviour
         instance = new SecondOrderDynamics(f, z, r, transform.position);
     }
     private void FixedUpdate() {
-        target.transform.position = instance.UpdateValues(Time.fixedDeltaTime, transform.position);
+        target.transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, transform.position);
     }
 }

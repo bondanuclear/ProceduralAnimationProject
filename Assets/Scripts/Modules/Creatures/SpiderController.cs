@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Modules.Math;
 using UnityEngine;
 //using System.Numerics;
 public class SpiderController : MonoBehaviour
@@ -23,7 +24,8 @@ public class SpiderController : MonoBehaviour
     private Vector3 targetMovePos;
     private Vector3 resultVector;
     
-    private void Start() {
+    private void Start() 
+    {
         instance = new SecondOrderDynamics(f,z,r, transform.position);
         targetMovePos = transform.position;
     }
@@ -74,7 +76,7 @@ public class SpiderController : MonoBehaviour
         //Debug.Log(instance.UpdateValues(Time.fixedDeltaTime, transform.position));
         
         //target.transform.position = instance.UpdateValues(Time.fixedDeltaTime, transform.position);
-        transform.position = instance.UpdateValues(Time.fixedDeltaTime, targetMovePos);
+        transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, targetMovePos);
     }
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(rayOrigin.position, 0.1f);
