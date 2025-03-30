@@ -46,6 +46,7 @@ namespace Modules.Infrastructure.StateMachine
         }
         private void ConstructDetectionCollider()
         {
+           
             float wingspan = _characterController.height;
             BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
             boxCollider.size = new Vector3(wingspan, wingspan, wingspan);   

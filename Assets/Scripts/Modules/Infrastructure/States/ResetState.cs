@@ -11,15 +11,17 @@ namespace Modules.Infrastructure.States
         }
         public override void OnTriggerEnter(Collider other)
         {
-            Debug.Log("Touched a wall in reset state " + other.name);
+            //Debug.Log("Touched a wall in reset state " + other.name);
         }
         public override void OnTriggerStay(Collider other)
         {
-            Debug.Log("Touching a wall in reset state " + other.name);
+            
+            //Debug.Log("Touching a wall in reset state " + other.name + " " + other.gameObject.layer);
         }
+       
         public override void OnTriggerExit(Collider other)
         {
-            Debug.Log("No longer touching interactable " + other.name );
+            //Debug.Log("No longer touching interactable " + other.name );
         }
         public override void EnterState()
         {
@@ -31,8 +33,8 @@ namespace Modules.Infrastructure.States
         }
         public override EEnvironmentInteractionState GetNextState()
         {
-            //return EEnvironmentInteractionState.Search;
-            return StateKey;
+            return EEnvironmentInteractionState.Search;
+            //return StateKey;
         }
 
         public override void ExitState()

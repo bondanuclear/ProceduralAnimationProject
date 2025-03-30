@@ -13,14 +13,17 @@ namespace Modules.Infrastructure.States
         public EnvironmentInteractionState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(stateKey)
         {
             //Debug.Log("Called EnvironmentInteractionState constructor with ");
-            _context = context;
+            _context ??= context;
+           
         }
 
         protected void StartIKTargetPositionTracking(Collider intersectingCollider)
         {
             if(intersectingCollider.gameObject.layer == LayerMask.NameToLayer(InteractableLayer) && _context.CurrentIntersectingCollider == null)
             {
+                
                 _context.CurrentIntersectingCollider = intersectingCollider;
+                
                 Vector3 closestPointFromRoot = GetClosestPointOnCollider(intersectingCollider, _context.RootTransform.position);
                 _context.SetCurrentSide(closestPointFromRoot);
                 SetIKTargetPosition();
@@ -33,11 +36,17 @@ namespace Modules.Infrastructure.States
             {
                 _context.CurrentIntersectingCollider = null;
                 _context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity; 
+                _context.CurrentIKConstraint.weight = 0;
             }
         }
         protected void UpdateIKTargetPositionTracking(Collider intersectingCollider)
         {
-            if(intersectingCollider != _context.CurrentIntersectingCollider)
+            if(_context.CurrentIntersectingCollider is null)
+            {
+                //Debug.Log("Stopping UpdateIKTargetPositionTracking");
+                return;
+            }
+            if(intersectingCollider == _context.CurrentIntersectingCollider)
             {
                 SetIKTargetPosition();
             }
@@ -45,12 +54,27 @@ namespace Modules.Infrastructure.States
 
         private Vector3 GetClosestPointOnCollider(Collider intersectingCollider, Vector3 positionToCheck)
         {
+            
             return intersectingCollider.ClosestPoint(positionToCheck);
         }
         private void SetIKTargetPosition()
         {
+            if(_context is null) return;
+            if(_context.CurrentIntersectingCollider is null)
+            {
+                Debug.Log("_context.CurrentIntersectingCollider is null");
+                return;
+            }
+            
             _context.ClosestPointOnColliderFromShoulder = GetClosestPointOnCollider(_context.CurrentIntersectingCollider, 
                new Vector3(_context.CurrentShoulderTransform.position.x, _context.CharacterShoulderHeight, _context.CurrentShoulderTransform.position.z) );
+            var directionRay = _context.CurrentShoulderTransform.position - _context.ClosestPointOnColliderFromShoulder;
+            var normalizedDirection = directionRay.normalized;
+            float offsetDistance = 0.05f;
+            Vector3 offset = normalizedDirection * offsetDistance;
+            Vector3 offsetPosition = _context.ClosestPointOnColliderFromShoulder + offset;
+            _context.CurrentIKTargetTransform.position = offsetPosition;
+            _context.CurrentIKConstraint.weight = 1;
         }
     }
 }

@@ -37,22 +37,26 @@ namespace Modules.Infrastructure.States
         private void TransitionToNextState(TState stateKey)
         {
             _isTransitioningState = true;
-        if(_currentState is null) return;
-        _currentState.ExitState();
-        if(_states.TryGetValue(stateKey, out _currentState))
-        {
-            _currentState.EnterState();
-        }
-        _isTransitioningState = false;
+            if(_currentState is null) return;
+            _currentState.ExitState();
+            if(_states.TryGetValue(stateKey, out _currentState))
+            {
+
+                _currentState.EnterState();
+            }
+            _isTransitioningState = false;
         }
 
         private void OnTriggerEnter(Collider other){
+            Debug.Log("OnTriggerEnter " + _currentState.GetType().Name);
             _currentState.OnTriggerEnter(other);
         }
         private void OnTriggerExit(Collider other){
+            Debug.Log("OnTriggerExit " + _currentState.GetType().Name);
             _currentState.OnTriggerExit(other);
         }
         private void OnTriggerStay(Collider other) {
+            Debug.Log("OnTriggerStay " + _currentState.GetType().Name);
             _currentState.OnTriggerStay(other);
         }
     }
