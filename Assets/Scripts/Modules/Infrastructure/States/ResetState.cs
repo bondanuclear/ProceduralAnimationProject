@@ -31,6 +31,7 @@ namespace Modules.Infrastructure.States
         }
         public override EEnvironmentInteractionState GetNextState()
         {
+            //return EEnvironmentInteractionState.Search;
             return StateKey;
         }
 

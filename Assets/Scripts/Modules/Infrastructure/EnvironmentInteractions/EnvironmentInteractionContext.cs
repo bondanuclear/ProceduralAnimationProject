@@ -47,12 +47,14 @@ public class EnvironmentInteractionContext
         bool isLeftCloser = Vector3.Distance(positionToCheck, leftShoulder) < Vector3.Distance(positionToCheck, rightShoulder);
         if(isLeftCloser)
         {
+            Debug.Log("Left side is closer");
             CurrentBodySide = EBodySide.Left;
             CurrentIKConstraint = _leftIKConstraint;
             CurrentMultiRotationConstraint = _leftMultiRotationConstraint;
         }
         else
         {
+            Debug.Log("Right side is closer");
             CurrentBodySide = EBodySide.Right;
             CurrentIKConstraint = _rightIKConstraint;
             CurrentMultiRotationConstraint = _rightMultiRotationConstraint;
