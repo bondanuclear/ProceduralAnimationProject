@@ -14,6 +14,7 @@ public class SpiderController : MonoBehaviour
     [SerializeField] float distanceFromGround;
     [SerializeField] Transform centerOfRotation;
     [SerializeField] float rotatingSpeed = 4f;
+
     [Header("Parameters of the second order system: ")]
     [SerializeField] float f;
     [SerializeField] float z;
@@ -24,8 +25,8 @@ public class SpiderController : MonoBehaviour
     
     private void Start() 
     {
-        //_equationSolver = new SecondOrderDynamicsEuler(f,z,r, transform.position);
-        _equationSolver = new SecondOrderDynamicsVerlet(f, z, r, transform.position, Time.fixedDeltaTime);
+        _equationSolver = new SecondOrderDynamicsEuler(f,z,r, transform.position);
+        //_equationSolver = new SecondOrderDynamicsVerlet(f, z, r, transform.position, Time.fixedDeltaTime);
         targetMovePos = transform.position;
        
         
@@ -64,7 +65,7 @@ public class SpiderController : MonoBehaviour
     {
        
         // Оновлюємо позицію за методом Верле
-        transform.position = _equationSolver.UpdateValues(targetMovePos);
+        transform.position = _equationSolver.UpdateValues(targetMovePos, null, Time.fixedDeltaTime);
     }
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(rayOrigin.position, 0.1f);
