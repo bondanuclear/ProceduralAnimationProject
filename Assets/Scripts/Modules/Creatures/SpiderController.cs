@@ -5,7 +5,6 @@ using UnityEngine;
 //using System.Numerics;
 public class SpiderController : MonoBehaviour
 {
-
     [Header("Ray settings: ")]
     [SerializeField] Transform rayOrigin;
     [SerializeField] float rayLength;
@@ -19,15 +18,17 @@ public class SpiderController : MonoBehaviour
     [SerializeField] float f;
     [SerializeField] float z;
     [SerializeField] float r;
-    //float timer = Mathf.Infinity;
-    private SecondOrderDynamics instance;
+    private IEquationSolver _equationSolver;
     private Vector3 targetMovePos;
     private Vector3 resultVector;
     
     private void Start() 
     {
-        instance = new SecondOrderDynamics(f,z,r, transform.position);
+        //_equationSolver = new SecondOrderDynamicsEuler(f,z,r, transform.position);
+        _equationSolver = new SecondOrderDynamicsVerlet(f, z, r, transform.position, Time.fixedDeltaTime);
         targetMovePos = transform.position;
+       
+        
     }
     private void Update() 
     {
@@ -44,39 +45,26 @@ public class SpiderController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.A)) 
         {
-            //centerOfRotation.eulerAngles -= new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
-            //transform.eulerAngles -= new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
+            
             targetMovePos.x -= Time.deltaTime * speed;
         }
         else if (Input.GetKey(KeyCode.D)) 
         {
-            //centerOfRotation.eulerAngles += new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
-            //transform.eulerAngles += new Vector3(0, rotatingSpeed * Time.deltaTime, 0);
             targetMovePos.x += Time.deltaTime * speed;
         }
         if (Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit info, rayLength, layerMask))
         {
             targetMovePos.y = info.point.y + distanceFromGround;
-            //transform.rotation = Quaternion.FromToRotation(Vector3.up, info.normal);
-            //Quaternion rs = Quaternion.FromToRotation(Vector3.up, info.normal);
-            //transform.rotation = Quaternion.Slerp(transform.rotation, rs, Time.deltaTime * 2);
-            //Debug.DrawRay(info.point, info.normal * 3);
+           
         }
         
-        //Debug.Log(targetMovePos);
+       
     }
-    private void FixedUpdate() {
-        // timer += Time.deltaTime;
-        // if(timer > 3f)
-        // {
-        //     timer = 0;
-        //     Debug.Log(" Second order dynamics is called "
-        //      + instance.UpdateValues(Time.fixedDeltaTime, transform.position));
-        // }
-        //Debug.Log(instance.UpdateValues(Time.fixedDeltaTime, transform.position));
-        
-        //target.transform.position = instance.UpdateValues(Time.fixedDeltaTime, transform.position);
-        transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, targetMovePos);
+    private void FixedUpdate() 
+    {
+       
+        // Оновлюємо позицію за методом Верле
+        transform.position = _equationSolver.UpdateValues(targetMovePos);
     }
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(rayOrigin.position, 0.1f);

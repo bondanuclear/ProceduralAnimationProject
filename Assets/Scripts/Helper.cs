@@ -10,11 +10,11 @@ public class Helper : MonoBehaviour
     [SerializeField] float f;
     [SerializeField] float z;
     [SerializeField] float r;
-    private SecondOrderDynamics instance;
+    private SecondOrderDynamicsEuler instance;
     private void Start() {
-        instance = new SecondOrderDynamics(f, z, r, transform.position);
+        instance = new SecondOrderDynamicsEuler(f, z, r, transform.position);
     }
     private void FixedUpdate() {
-        target.transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, transform.position);
+        //target.transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, transform.position);
     }
 }

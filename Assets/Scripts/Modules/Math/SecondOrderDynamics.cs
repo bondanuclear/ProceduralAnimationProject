@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Modules.Math
 {
-    public class SecondOrderDynamics
+    public class SecondOrderDynamicsEuler : IEquationSolver
     {
         private Vector3 xp;
         private Vector3 y, yd;
         private float k1, k2, k3;
 
-        public SecondOrderDynamics(float f, float z, float r, Vector3 x0)
+        public SecondOrderDynamicsEuler(float f, float z, float r, Vector3 x0)
         {
             k1 = z / (f * Mathf.PI);
             k2 = 1 / ((2 * Mathf.PI * f) * (2 * Mathf.PI * f));
@@ -26,7 +26,7 @@ namespace Modules.Math
         /// <param name="x">Input position</param>
         /// <param name="xd">Derivative of input position</param>
         /// <returns></returns>
-        public Vector3 UpdateValuesEuler(float T, Vector3 x, Vector3? xd = null)
+        public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
         {
             if (xd == null)
             {
@@ -39,13 +39,8 @@ namespace Modules.Math
             //Debug.Log("Y derivative is " + yd);
             return y;
         }
-        /// <summary>
-        /// To do: implement verlet integration.
-        /// </summary>
-        public void UpdateValuesVerlet()
-        {
-            
-        }
+
+      
     }
 
 }
