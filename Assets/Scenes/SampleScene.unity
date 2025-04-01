@@ -441,8 +441,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1602563803}
-  f: 2
-  z: 0.5
+  f: 1
+  z: 0.3
   r: -3
 --- !u!1 &550416319
 GameObject:
