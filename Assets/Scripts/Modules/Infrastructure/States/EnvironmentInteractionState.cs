@@ -36,7 +36,7 @@ namespace Modules.Infrastructure.States
             {
                 _context.CurrentIntersectingCollider = null;
                 _context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity; 
-                _context.CurrentIKConstraint.weight = 0;
+                //_context.CurrentIKConstraint.weight = 0;
             }
         }
         protected void UpdateIKTargetPositionTracking(Collider intersectingCollider)
@@ -74,7 +74,7 @@ namespace Modules.Infrastructure.States
             Vector3 offset = normalizedDirection * offsetDistance;
             Vector3 offsetPosition = _context.ClosestPointOnColliderFromShoulder + offset;
             _context.CurrentIKTargetTransform.position = offsetPosition;
-            _context.CurrentIKConstraint.weight = 1;
+            //_context.CurrentIKConstraint.weight = 1;
         }
     }
 }

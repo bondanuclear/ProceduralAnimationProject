@@ -4,6 +4,7 @@ namespace Modules.Infrastructure.States
 {
     public class SearchState : EnvironmentInteractionState
     {
+        private float _approachDistanceThreshold = 2f;
         private EEnvironmentInteractionState _stateKey;
         
         public SearchState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(environmentInteractionContext, stateKey)
@@ -27,6 +28,12 @@ namespace Modules.Infrastructure.States
         }
         public override EEnvironmentInteractionState GetNextState()
         {
+            bool isCloseToTarget = Vector3.Distance(_context.ClosestPointOnColliderFromShoulder, _context.RootTransform.position) < _approachDistanceThreshold;
+            bool isClosestPointOnColliderValid = _context.ClosestPointOnColliderFromShoulder != Vector3.positiveInfinity;
+            if(isCloseToTarget && isClosestPointOnColliderValid)
+            {
+                return EEnvironmentInteractionState.Approach;
+            }
             return StateKey;
         }
         public override void OnTriggerEnter(Collider other)

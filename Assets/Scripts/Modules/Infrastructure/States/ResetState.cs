@@ -4,37 +4,50 @@ namespace Modules.Infrastructure.States
 {
     public class ResetState : EnvironmentInteractionState
     {
+        private float _elapsedTime = 0;
+        private float _resetDuration = 2f;
         public ResetState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(context, stateKey)
         {
-            //Debug.Log("Called ResetState constructor!");
-            EnvironmentInteractionContext _context = context;
+           
+           
         }
         public override void OnTriggerEnter(Collider other)
         {
-            //Debug.Log("Touched a wall in reset state " + other.name);
+            
+           
         }
         public override void OnTriggerStay(Collider other)
         {
             
-            //Debug.Log("Touching a wall in reset state " + other.name + " " + other.gameObject.layer);
+           
         }
        
         public override void OnTriggerExit(Collider other)
         {
-            //Debug.Log("No longer touching interactable " + other.name );
+          
         }
         public override void EnterState()
         {
-            Debug.Log("Entered Reset State");
+             Debug.Log("Entered Reset State");
+           _elapsedTime = 0;
+           _context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity;
+           _context.CurrentIntersectingCollider = null;
         }
         public override void UpdateState()
         {
-            Debug.Log("Updating reset state!");
+           _elapsedTime += Time.deltaTime;
         }
         public override EEnvironmentInteractionState GetNextState()
         {
-            return EEnvironmentInteractionState.Search;
-            //return StateKey;
+            bool isMoving = _context.CharacterController.velocity != Vector3.zero;
+            if( _elapsedTime >= _resetDuration && isMoving)
+            {
+                
+                return EEnvironmentInteractionState.Search;
+            }
+
+            
+            return StateKey;
         }
 
         public override void ExitState()
