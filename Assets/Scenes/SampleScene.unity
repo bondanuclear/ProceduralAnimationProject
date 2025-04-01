@@ -338,7 +338,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &453044699
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -441,9 +441,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1602563803}
-  f: 1
-  z: 0.15
-  r: 3
+  f: 2
+  z: 0.5
+  r: -3
 --- !u!1 &550416319
 GameObject:
   m_ObjectHideFlags: 0
@@ -1626,7 +1626,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1602563800
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1876,12 +1876,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
+      propertyPath: f
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: r
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: z
-      value: 0.3
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: centerOfRotation

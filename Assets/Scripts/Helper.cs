@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Modules.Math;
+using Modules.Maths;
 using UnityEngine;
 
 public class Helper : MonoBehaviour
@@ -10,11 +10,11 @@ public class Helper : MonoBehaviour
     [SerializeField] float f;
     [SerializeField] float z;
     [SerializeField] float r;
-    private SecondOrderDynamicsEuler instance;
+    private IEquationSolver instance;
     private void Start() {
-        instance = new SecondOrderDynamicsEuler(f, z, r, transform.position);
+        instance = new SemiImplicitEuler(f, z, r, transform.position);
     }
     private void FixedUpdate() {
-        //target.transform.position = instance.UpdateValuesEuler(Time.fixedDeltaTime, transform.position);
+        target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime );
     }
 }

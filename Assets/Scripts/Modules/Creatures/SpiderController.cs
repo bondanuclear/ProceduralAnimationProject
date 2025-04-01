@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Modules.Math;
+using Modules.Maths;
 using UnityEngine;
 //using System.Numerics;
 public class SpiderController : MonoBehaviour
@@ -25,7 +25,8 @@ public class SpiderController : MonoBehaviour
     
     private void Start() 
     {
-        _equationSolver = new SecondOrderDynamicsEuler(f,z,r, transform.position);
+        _equationSolver = new SemiImplicitEuler(f,z,r, transform.position);
+        //_equationSolver = new EulerStableCorrectPhysics(f,z,r, transform.position);
         //_equationSolver = new SecondOrderDynamicsVerlet(f, z, r, transform.position, Time.fixedDeltaTime);
         targetMovePos = transform.position;
        

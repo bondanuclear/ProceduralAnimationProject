@@ -1,15 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-namespace Modules.Math
+namespace Modules.Maths
 {
-    public class SecondOrderDynamicsEuler : IEquationSolver
+    public class EulerStable : IEquationSolver
     {
         private Vector3 xp;
         private Vector3 y, yd;
         private float k1, k2, k3;
 
-        public SecondOrderDynamicsEuler(float f, float z, float r, Vector3 x0)
+        public EulerStable(float f, float z, float r, Vector3 x0)
         {
             k1 = z / (f * Mathf.PI);
             k2 = 1 / ((2 * Mathf.PI * f) * (2 * Mathf.PI * f));
@@ -19,10 +17,11 @@ namespace Modules.Math
             y = x0;
             yd = Vector3.zero;
         }
+
         /// <summary>
-        /// Semi-Implicit Euler's method for solving differential equations.
+        /// Stable Semi-Implicit Euler's method for solving differential equations.
         /// </summary>
-        /// <param name="T">Time</param>
+        /// <param name="T">Time step</param>
         /// <param name="x">Input position</param>
         /// <param name="xd">Derivative of input position</param>
         /// <returns></returns>
@@ -31,16 +30,16 @@ namespace Modules.Math
             if (xd == null)
             {
                 xd = (x - xp) / T;
-                //Debug.Log(xd + " x derivative");
+                
                 xp = x;
             }
+
+            float k2_stable = Mathf.Max(k2, 1.1f * (T*T/4 + T*k1/2));
+        
             y = y + T * yd;
-            yd = yd + T * (x + k3 * xd.Value - y - k1 * yd) / k2;
-            //Debug.Log("Y derivative is " + yd);
+            yd = yd + T * (x + k3 * xd.Value - y - k1 * yd) / k2_stable;
+        
             return y;
-        }
-
-      
+        }    
     }
-
 }
