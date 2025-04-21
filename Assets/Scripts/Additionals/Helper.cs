@@ -12,7 +12,7 @@ public class Helper : MonoBehaviour
     [SerializeField] float r;
     private IEquationSolver instance;
     private void Start() {
-        instance = new EulerStable(f, z, r, transform.position);
+        instance = new SemiImplicitEuler(f, z, r, transform.position);
     }
     private void FixedUpdate() {
         target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime );
