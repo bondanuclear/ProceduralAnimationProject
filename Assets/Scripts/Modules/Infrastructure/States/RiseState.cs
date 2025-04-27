@@ -11,6 +11,8 @@ namespace Modules.Infrastructure.States
         private LayerMask _interactionLayerMask = LayerMask.GetMask("Interactable");
         private Quaternion _expectedHandRotation;
         private float _rotationSpeed = 200f;
+        private float _touchDistanceThreshold = 0.05f;
+        private float _touchTimeThreshold = 1f;
         public RiseState(EnvironmentInteractionContext environmentInteractionContext, EEnvironmentInteractionState stateKey) : base(environmentInteractionContext, stateKey)
         {
         
@@ -19,6 +21,7 @@ namespace Modules.Infrastructure.States
         public override void EnterState()
         {
             Debug.Log("Rise State Enter");
+            _elapsedTime = 0;
         }
 
         public override void ExitState()
@@ -28,6 +31,11 @@ namespace Modules.Infrastructure.States
 
         public override EEnvironmentInteractionState GetNextState()
         {
+           if(Vector3.Distance(_context.CurrentIKTargetTransform.position, _context.ClosestPointOnColliderFromShoulder) < _touchDistanceThreshold
+            && _elapsedTime > _touchTimeThreshold)
+           {
+                return EEnvironmentInteractionState.Touch;
+           }
             return StateKey;
         }
 
