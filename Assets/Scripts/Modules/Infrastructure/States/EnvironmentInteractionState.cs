@@ -73,7 +73,7 @@ namespace Modules.Infrastructure.States
             float offsetDistance = 0.05f;
             Vector3 offset = normalizedDirection * offsetDistance;
             Vector3 offsetPosition = _context.ClosestPointOnColliderFromShoulder + offset;
-            _context.CurrentIKTargetTransform.position = offsetPosition;
+            _context.CurrentIKTargetTransform.position = new Vector3(offsetPosition.x, _context.InteractionPointYOffset, offsetPosition.z);
             //_context.CurrentIKConstraint.weight = 1;
         }
     }

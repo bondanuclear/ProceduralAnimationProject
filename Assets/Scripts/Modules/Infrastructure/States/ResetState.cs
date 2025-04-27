@@ -6,6 +6,8 @@ namespace Modules.Infrastructure.States
     {
         private float _elapsedTime = 0;
         private float _resetDuration = 2f;
+        private float _lerpDuration = 10f;
+        private float _rotationSpeed = 200f;
         public ResetState(EnvironmentInteractionContext context, EEnvironmentInteractionState stateKey) : base(context, stateKey)
         {
            
@@ -28,14 +30,19 @@ namespace Modules.Infrastructure.States
         }
         public override void EnterState()
         {
-             Debug.Log("Entered Reset State");
-           _elapsedTime = 0;
+            Debug.Log("Entered Reset State");
+           _elapsedTime = 0;    
            _context.ClosestPointOnColliderFromShoulder = Vector3.positiveInfinity;
            _context.CurrentIntersectingCollider = null;
         }
         public override void UpdateState()
         {
            _elapsedTime += Time.deltaTime;
+           _context.InteractionPointYOffset = Mathf.Lerp(_context.InteractionPointYOffset, _context.ColliderCenterY, _elapsedTime / _lerpDuration);
+           _context.CurrentIKConstraint.weight = Mathf.Lerp(_context.CurrentIKConstraint.weight, 0, _elapsedTime / _lerpDuration); 
+           _context.CurrentMultiRotationConstraint.weight = Mathf.Lerp(_context.CurrentMultiRotationConstraint.weight, 0, _elapsedTime / _lerpDuration);
+           _context.CurrentIKTargetTransform.localPosition = Vector3.Lerp(_context.CurrentIKTargetTransform.localPosition, _context.CurrentOriginalTargetPosition, _elapsedTime / _lerpDuration);
+           _context.CurrentIKTargetTransform.rotation = Quaternion.RotateTowards(_context.CurrentIKTargetTransform.rotation, _context.OriginalTargetRotation, _rotationSpeed*Time.deltaTime);
         }
         public override EEnvironmentInteractionState GetNextState()
         {

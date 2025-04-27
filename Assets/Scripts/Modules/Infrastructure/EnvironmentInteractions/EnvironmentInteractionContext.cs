@@ -10,19 +10,25 @@ public class EnvironmentInteractionContext
     //private Rigidbody _rigidbody;
     //private Collider _collider;
     private Transform _rootTransform;
+    private Vector3 _leftOriginalTargetPosition;
+    private Vector3 _rightOriginalTargetPosition;
     private CharacterController _characterController;
     public EnvironmentInteractionContext(TwoBoneIKConstraint leftIKConstraint, TwoBoneIKConstraint rightIKConstraint, MultiRotationConstraint leftMultiRotationConstraint, MultiRotationConstraint rightMultiRotationConstraint, Transform rootTransform, CharacterController characterController)
     {
         //Debug.Log("Called EnvironmentInteractionContext constructor!");
-        LeftIKConstraint = leftIKConstraint;
-        RightIKConstraint = rightIKConstraint;
-        LeftMultiRotationConstraint = leftMultiRotationConstraint;
-        RightMultiRotationConstraint = rightMultiRotationConstraint;
+        _leftIKConstraint = leftIKConstraint;
+        _rightIKConstraint = rightIKConstraint;
+        _leftMultiRotationConstraint = leftMultiRotationConstraint;
+        _rightMultiRotationConstraint = rightMultiRotationConstraint;
         // _rigidbody = rigidbody;
         // _collider = collider;
         _rootTransform = rootTransform;
+        _leftOriginalTargetPosition = leftIKConstraint.data.target.localPosition;
+        _rightOriginalTargetPosition = rightIKConstraint.data.target.localPosition;
+        _characterController = characterController;
         CharacterShoulderHeight = leftIKConstraint.data.root.position.y;
-        CharacterController = characterController;
+        OriginalTargetRotation = leftIKConstraint.data.target.localRotation;
+        SetCurrentSide(Vector3.positiveInfinity);
     }
 
     public TwoBoneIKConstraint LeftIKConstraint { get => _leftIKConstraint; set => _leftIKConstraint = value; }
@@ -41,6 +47,10 @@ public class EnvironmentInteractionContext
     public Vector3 ClosestPointOnColliderFromShoulder { get; set; } = Vector3.positiveInfinity;
     public float CharacterShoulderHeight { get; set; }
     public CharacterController CharacterController { get => _characterController; set => _characterController = value; }
+    public float InteractionPointYOffset { get; set; } = 0f;
+    public float ColliderCenterY { get; set; }
+    public Vector3 CurrentOriginalTargetPosition { get; private set; }
+    public Quaternion OriginalTargetRotation { get; private set; }
 
     public void SetCurrentSide(Vector3 positionToCheck)
     {
@@ -54,6 +64,8 @@ public class EnvironmentInteractionContext
             CurrentBodySide = EBodySide.Left;
             CurrentIKConstraint = _leftIKConstraint;
             CurrentMultiRotationConstraint = _leftMultiRotationConstraint;
+            CurrentOriginalTargetPosition = _leftOriginalTargetPosition;
+            
         }
         else
         {
@@ -61,9 +73,12 @@ public class EnvironmentInteractionContext
             CurrentBodySide = EBodySide.Right;
             CurrentIKConstraint = _rightIKConstraint;
             CurrentMultiRotationConstraint = _rightMultiRotationConstraint;
+            CurrentOriginalTargetPosition = _rightOriginalTargetPosition;
+            
         }
 
         CurrentShoulderTransform = CurrentIKConstraint.data.root.transform;
         CurrentIKTargetTransform = CurrentIKConstraint.data.target.transform;
+        
     }
 }

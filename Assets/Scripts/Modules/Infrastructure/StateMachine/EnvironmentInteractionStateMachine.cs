@@ -52,6 +52,8 @@ namespace Modules.Infrastructure.StateMachine
             boxCollider.size = new Vector3(wingspan, wingspan, wingspan);   
             boxCollider.center = new Vector3(_characterController.center.x, _characterController.center.y + (wingspan*0.25f), _characterController.center.z + (wingspan*0.5f));
             boxCollider.isTrigger = true;
+            _context.ColliderCenterY = _characterController.center.y;
+            
         }
         private void OnDrawGizmosSelected()
         {
