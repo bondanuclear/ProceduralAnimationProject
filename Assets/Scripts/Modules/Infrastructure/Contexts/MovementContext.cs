@@ -1,6 +1,7 @@
 // MovementContext.cs
 using Modules.Maths;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class MovementContext
 {
@@ -8,12 +9,16 @@ public class MovementContext
     private Transform _characterTransform;
     private Transform _targetTransform;
     private CharacterController _characterController;
-    
+    private Transform _spineTarget;
+    private TwoBoneIKConstraint _spineIK;
+    private Vector3 _spineTargetOriginalPosition;
     // Movement parameters
     private float _currentSpeed;
     private float _walkSpeed;
     private float _runSpeed;
     private Vector3 _moveDirection;
+    private MonoBehaviour _monoBehaviour;
+
     
     // Second-order dynamics parameters for different states
     private (float f, float z, float r) _idleParams;
@@ -24,36 +29,47 @@ public class MovementContext
     // Current state parameters
     private (float f, float z, float r) _currentParams;
     
-    // Constructor
     public MovementContext(Transform characterTransform, CharacterController characterController, 
                           float walkSpeed, float runSpeed,
                           (float f, float z, float r) idleParams,
                           (float f, float z, float r) walkParams,
                           (float f, float z, float r) runParams,
-                          (float f, float z, float r) stopParams)
+                          (float f, float z, float r) stopParams, Transform spineTarget, TwoBoneIKConstraint spineIK, MonoBehaviour monoBehaviour)
     {
         _characterTransform = characterTransform;
         _characterController = characterController;
         _walkSpeed = walkSpeed;
         _runSpeed = runSpeed;
-        
+        _spineTarget = spineTarget;
         _idleParams = idleParams;
         _walkParams = walkParams;
         _runParams = runParams;
         _stopParams = stopParams;
-        
+        _spineIK = spineIK;
+        _monoBehaviour = monoBehaviour;
+        _spineTargetOriginalPosition = spineTarget.transform.localPosition;
         // Create target transform
-        GameObject targetObj = new GameObject("MovementTarget");
-        
-        _targetTransform = targetObj.transform;
-        _targetTransform.SetParent(_characterTransform.parent);
-        _targetTransform.position = _characterTransform.position;
-        
-        // Initialize with idle parameters
+        CreateMovementTarget();
+
+        // Initialize with run parameters
+        SetSecondOrderParameters();
+    }
+
+    private void SetSecondOrderParameters()
+    {
         _currentParams = _runParams;
+        Debug.Log("SetSecondOrderParameters: " + _currentParams.f + " " + _currentParams.z + " " + _currentParams.r);
         _equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
     }
-    
+
+    private void CreateMovementTarget()
+    {
+        GameObject targetObj = new GameObject("MovementTarget");
+        _targetTransform = targetObj.transform;
+        _targetTransform.SetParent(_characterController.transform);
+        _targetTransform.position = _characterController.transform.position;
+    }
+
     // Update movement based on input
     public void UpdateMovement(Vector3 inputDirection, bool isRunning)
     {
@@ -113,4 +129,9 @@ public class MovementContext
         public Transform CharacterTransform { get => _characterTransform; }
         public Transform TargetTransform { get => _targetTransform; }
         public CharacterController CharacterController { get => _characterController; }
+        public Transform SpineTarget { get => _spineTarget; private set => _spineTarget = value; } 
+        public TwoBoneIKConstraint SpineIK { get => _spineIK; private set => _spineIK = value; } 
+        public MonoBehaviour MonoBehaviour { get => _monoBehaviour; }
+        public Vector3 SpineTargetOriginalPosition { get => _spineTargetOriginalPosition; private set => _spineTargetOriginalPosition = value; }
+        public bool ShouldUpdateSpineTarget { get; set; }
 }

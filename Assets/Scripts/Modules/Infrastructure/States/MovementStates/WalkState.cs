@@ -12,6 +12,8 @@ namespace Modules.Infrastructure.States.MovementStates
         
         public override void EnterState()
         {
+            //_context.ShouldUpdateSpineTarget = false;
+            //_context.SpineIK.weight = 0f;
             Debug.Log("WalkState EnterState");
             //_context.SetStateParameters(EMovementState.Walk);
         }

@@ -13,6 +13,8 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void EnterState()
         {
             Debug.Log("IdleState EnterState");
+            _context.ShouldUpdateSpineTarget = false;
+            _context.SpineIK.weight = 0f;
             //_context.SetStateParameters(EMovementState.Idle);
         }
 

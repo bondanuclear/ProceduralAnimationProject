@@ -12,6 +12,8 @@ namespace Modules.Infrastructure.States.MovementStates
         
         public override void EnterState()
         {
+            //_context.SpineIK.weight = 1f;
+            _context.ShouldUpdateSpineTarget = true;
             Debug.Log("RunState EnterState");
             _context.SetStateParameters(EMovementState.Run);
         }
@@ -19,6 +21,7 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void ExitState()
         {
             Debug.Log("RunState ExitState");
+            //_context.SpineIK.weight = 1f;
             // No special cleanup needed when exiting run state
         }
         
@@ -38,6 +41,8 @@ namespace Modules.Infrastructure.States.MovementStates
         
         public override void UpdateState()
         {
+            //_context.SpineIK.transform.position = new Vector3(_context.SpineIK.transform.position.x, _context.SpineIK.transform.position.y, _context.TargetTransform.position.z);
+            _context.SpineIK.weight = Mathf.Lerp(_context.SpineIK.weight, 1f, Time.deltaTime * 5f);
             Debug.Log("RunState UpdateState");
             // Run state doesn't need special updates
         }
