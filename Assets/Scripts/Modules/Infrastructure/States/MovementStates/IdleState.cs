@@ -13,7 +13,7 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void EnterState()
         {
             Debug.Log("IdleState EnterState");
-            _context.SetStateParameters(EMovementState.Idle);
+            //_context.SetStateParameters(EMovementState.Idle);
         }
 
         public override void ExitState()

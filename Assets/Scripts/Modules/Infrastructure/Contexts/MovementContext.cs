@@ -44,12 +44,13 @@ public class MovementContext
         
         // Create target transform
         GameObject targetObj = new GameObject("MovementTarget");
+        
         _targetTransform = targetObj.transform;
         _targetTransform.SetParent(_characterTransform.parent);
         _targetTransform.position = _characterTransform.position;
         
         // Initialize with idle parameters
-        _currentParams = _idleParams;
+        _currentParams = _runParams;
         _equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
     }
     
@@ -76,9 +77,9 @@ public class MovementContext
     }
     
     // Update character position using equation solver
-    public void UpdateCharacterPosition()
+    public void UpdateTargetPosition()
     {
-        _characterTransform.position = _equationSolver.UpdateValues(_targetTransform.position, null, Time.fixedDeltaTime);
+        _targetTransform.position = _equationSolver.UpdateValues(_characterController.transform.position, null, Time.fixedDeltaTime);
     }
     
     // Change dynamics parameters based on state

@@ -13,7 +13,7 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void EnterState()
         {
             Debug.Log("WalkState EnterState");
-            _context.SetStateParameters(EMovementState.Walk);
+            //_context.SetStateParameters(EMovementState.Walk);
         }
 
         public override void ExitState()

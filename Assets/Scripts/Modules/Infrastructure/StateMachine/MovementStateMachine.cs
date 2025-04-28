@@ -66,22 +66,19 @@ public class MovementStateMachine : StateManager<EMovementState>
     // {
     //     base.Update();
     //     Debug.Log("MovementStateMachine Update: " + _context.CharacterController.velocity.magnitude);
-    // }
-    // private void Update()
-    // {
-    //     // Get input
+    //      // Get input
     //     float moveX = Input.GetAxis("Horizontal");
     //     float moveZ = Input.GetAxis("Vertical");
     //     _inputDirection = new Vector3(moveX, 0, moveZ);
     //     _isRunning = Input.GetKey(KeyCode.LeftShift) && _inputDirection.magnitude > 0.1f;
         
     //     // Update movement in context
-    //     _context.UpdateMovement(_inputDirection, _isRunning);
+    //     //_context.UpdateMovement(_inputDirection, _isRunning);
     // }
-    
-    // private void FixedUpdate()
-    // {
-    //     // Update character position using equation solver
-    //     _context.UpdateCharacterPosition();
-    // }
+  
+    private void FixedUpdate()
+    {
+        // Update character position using equation solver
+        _context.UpdateTargetPosition();
+    }
 }

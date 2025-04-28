@@ -57,7 +57,6 @@ public class SpiderController : MonoBehaviour
         if (Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit info, rayLength, layerMask))
         {
             targetMovePos.y = info.point.y + distanceFromGround;
-           
         }
         
        

@@ -14,7 +14,7 @@ namespace Modules.Infrastructure.States.MovementStates
         {
             Debug.Log("StopState EnterState");
             _stateTimer = 0f;
-            _context.SetStateParameters(EMovementState.Stop);
+            //_context.SetStateParameters(EMovementState.Stop);
         }
 
         public override void ExitState()
