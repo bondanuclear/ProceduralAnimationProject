@@ -492,7 +492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &449324781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,7 +537,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _headConstraint: {fileID: 1699792695}
   _headBone: {fileID: 404147630}
-  _maxTrackingAngle: 82.3
+  _maxTrackingAngle: 70
   _trackingSpeed: 2
   _returnSpeed: 1
   _detectionRadius: 10
@@ -1196,6 +1196,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1931385857}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1343974303
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1343974304}
+  - component: {fileID: 1343974305}
+  m_Layer: 8
+  m_Name: Movement
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1343974304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343974303}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1896380400}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1343974305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343974303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fc59577bbad54edf96d67be3d7ee384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _characterController: {fileID: 1896380407}
+  _walkSpeed: 5
+  _runSpeed: 8
+  _runThreshold: 0.7
+  _idleF: 0.5
+  _idleZ: 0.5
+  _idleR: 0.2
+  _walkF: 1
+  _walkZ: 0.7
+  _walkR: 0.5
+  _runF: 1.5
+  _runZ: 0.8
+  _runR: 0.6
+  _stopF: 0.8
+  _stopZ: 0.9
+  _stopR: 0.7
 --- !u!4 &1351526442 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8314937747027298841, guid: 8f42aadf237d03340a55ab0035bb1c6e, type: 3}
@@ -1229,7 +1289,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1387259453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2620,6 +2680,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 644045996933672309, guid: 8f42aadf237d03340a55ab0035bb1c6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 449324782}
+    - targetCorrespondingSourceObject: {fileID: 644045996933672309, guid: 8f42aadf237d03340a55ab0035bb1c6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1343974304}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1046583808634018251, guid: 8f42aadf237d03340a55ab0035bb1c6e, type: 3}
       insertIndex: -1

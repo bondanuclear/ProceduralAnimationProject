@@ -18,7 +18,7 @@ namespace Modules.Infrastructure.States
             //Debug.Log("Current state is " + _currentState.GetType().Name);
             _currentState.EnterState();
         }
-        void Update() {
+        protected void Update() {
             TState nextStateKey = _currentState.GetNextState();
             if(nextStateKey.Equals(_currentState.StateKey)) 
             {
