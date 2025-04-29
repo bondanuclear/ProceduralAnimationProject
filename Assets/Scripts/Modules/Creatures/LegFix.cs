@@ -13,6 +13,7 @@ namespace Modules.Creatures
         [SerializeField] Transform footEnd;
         [SerializeField] float stepDistance = 3f;
         [SerializeField] float minStepDistance = 0.1f; // Minimum threshold to prevent jittering
+        [SerializeField] float immediateRepositionDistance = 2f; // Distance threshold for immediate repositioning
         
         
         [SerializeField] LayerMask layerMask;
@@ -69,6 +70,17 @@ namespace Modules.Creatures
             }
             
             float distanceToTarget = Vector3.Distance(footEnd.position, targetSphere.position);
+            float distanceFromFeetToTarget = Vector3.Distance(transform.position, targetSphere.position);
+            //SIMPLE SOLUTION: If distance is very large, immediately reposition
+            if (distanceFromFeetToTarget > immediateRepositionDistance)
+            {
+                Debug.Log($"Large distance detected for {transform.name}: {distanceFromFeetToTarget}, immediately repositioning");
+                legOffset = targetHeight + targetSphere.position.y;
+                currentPosition = new Vector3(targetSphere.position.x, legOffset, targetSphere.position.z);
+                transform.position = currentPosition;
+                lerp = 1f;
+                return;
+            }
             
             // Only start a new step if we're not currently stepping and distance is significant
             if(distanceToTarget > stepDistance && lerp >= 1f && targetValid)
@@ -158,6 +170,13 @@ namespace Modules.Creatures
                     Gizmos.DrawLine(prevPoint, arcPoint);
                     prevPoint = arcPoint;
                 }
+            }
+            
+            // Visualize immediate reposition threshold
+            if (Application.isPlaying)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(footEnd.position, immediateRepositionDistance);
             }
         }
     }
