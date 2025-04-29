@@ -33,7 +33,7 @@ namespace Modules.Infrastructure.States.MovementStates
                 Debug.Log("WalkState GetNextState: Stop");
                 return EMovementState.Stop;
             }
-            else if (_context.CharacterController.velocity.magnitude >= 4)
+            else if (_context.CharacterController.velocity.magnitude >= _context.WalkSpeed)
             {
                 Debug.Log("WalkState GetNextState: Run");
                 return EMovementState.Run;

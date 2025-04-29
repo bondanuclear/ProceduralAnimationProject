@@ -7,7 +7,6 @@ namespace Modules.Infrastructure.States.MovementStates
     public class RunState : MovementState
     {
         private Quaternion _spineOriginalRotation;
-        private float _spineReturnSpeed = 100f;
         private float _maxSpineStopRotation = 40f;
         public RunState(MovementContext context, EMovementState stateKey) : base(context, stateKey)
         {
@@ -17,7 +16,6 @@ namespace Modules.Infrastructure.States.MovementStates
         
         public override void EnterState()
         {
-            //_context.SpineIK.weight = 1f;
             _context.ShouldUpdateSpineTarget = true;
             Debug.Log("RunState EnterState");
             
@@ -27,8 +25,6 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void ExitState()
         {
             Debug.Log("RunState ExitState");
-            //_context.SpineIK.weight = 1f;
-            // No special cleanup needed when exiting run state
         }
         
         public override EMovementState GetNextState()
@@ -37,7 +33,7 @@ namespace Modules.Infrastructure.States.MovementStates
             {
                 return EMovementState.Stop;
             }
-            else if (_context.CharacterController.velocity.magnitude < 4)
+            else if (_context.CharacterController.velocity.magnitude < _context.WalkSpeed)
             {
                 return EMovementState.Walk;
             }

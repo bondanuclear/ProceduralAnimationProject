@@ -19,8 +19,7 @@ namespace Modules.Infrastructure.States.MovementStates
             {
                 _context.MonoBehaviour.StartCoroutine(LerpSpineIKWeight(1f, 0f, 1.5f));
             } 
-            //_context.SpineIK.weight = 0f;
-            //_context.SetStateParameters(EMovementState.Idle);
+           
         }
         private IEnumerator LerpSpineIKWeight(float startWeight, float endWeight, float duration)
         {
@@ -39,13 +38,9 @@ namespace Modules.Infrastructure.States.MovementStates
            Debug.Log("IdleState ExitState");
         }
 
-        private float _movementStartTime = -1f;
 
         public override EMovementState GetNextState()
         {
-            Debug.Log("IdleState GetNextState");
-            Debug.Log(_context.CharacterController.velocity.magnitude);
-            // Only transition if horizontal velocity is significant and not just falling
             Vector3 horizontalVelocity = new Vector3(_context.CharacterController.velocity.x, 0, _context.CharacterController.velocity.z);
             
             if (horizontalVelocity.magnitude > 0.1f)
@@ -60,7 +55,7 @@ namespace Modules.Infrastructure.States.MovementStates
         public override void UpdateState()
         {
             Debug.Log("IdleState UpdateState");
-            // Idle state doesn't need special updates
+            
         }
     }
 }   

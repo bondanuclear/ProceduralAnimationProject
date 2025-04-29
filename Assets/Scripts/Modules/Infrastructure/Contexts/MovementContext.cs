@@ -21,30 +21,27 @@ public class MovementContext
 
     
     // Second-order dynamics parameters for different states
-    private (float f, float z, float r) _idleParams;
     private (float f, float z, float r) _walkParams;
     private (float f, float z, float r) _runParams;
-    private (float f, float z, float r) _stopParams;
+   
     
     // Current state parameters
     private (float f, float z, float r) _currentParams;
     
     public MovementContext(Transform characterTransform, CharacterController characterController, 
                           float walkSpeed, float runSpeed,
-                          (float f, float z, float r) idleParams,
                           (float f, float z, float r) walkParams,
                           (float f, float z, float r) runParams,
-                          (float f, float z, float r) stopParams, Transform spineTarget, TwoBoneIKConstraint spineIK, MonoBehaviour monoBehaviour)
+                          Transform spineTarget, TwoBoneIKConstraint spineIK, MonoBehaviour monoBehaviour)
     {
         _characterTransform = characterTransform;
         _characterController = characterController;
         _walkSpeed = walkSpeed;
         _runSpeed = runSpeed;
         _spineTarget = spineTarget;
-        _idleParams = idleParams;
         _walkParams = walkParams;
         _runParams = runParams;
-        _stopParams = stopParams;
+        
         _spineIK = spineIK;
         _monoBehaviour = monoBehaviour;
         _spineTargetOriginalPosition = spineTarget.transform.localPosition;
@@ -70,28 +67,6 @@ public class MovementContext
         _targetTransform.position = _characterController.transform.position;
     }
 
-    // Update movement based on input
-    public void UpdateMovement(Vector3 inputDirection, bool isRunning)
-    {
-        _moveDirection = inputDirection.normalized;
-        
-        // Determine speed based on input and running state
-        if (_moveDirection.magnitude > 0.1f)
-        {
-            _currentSpeed = isRunning ? _runSpeed : _walkSpeed;
-        }
-        else
-        {
-            _currentSpeed = 0f;
-        }
-        
-        // Update target position
-        if (_currentSpeed > 0)
-        {
-            _targetTransform.position += _moveDirection * _currentSpeed * Time.deltaTime;
-        }
-    }
-    
     // Update character position using equation solver
     public void UpdateTargetPosition()
     {
@@ -103,17 +78,11 @@ public class MovementContext
     {
         switch (state)
         {
-            case EMovementState.Idle:
-                _currentParams = _idleParams;
-                break;
             case EMovementState.Walk:
                 _currentParams = _walkParams;
                 break;
             case EMovementState.Run:
                 _currentParams = _runParams;
-                break;
-            case EMovementState.Stop:
-                _currentParams = _stopParams;
                 break;
         }
         
