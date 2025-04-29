@@ -1244,7 +1244,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1343974304
 Transform:
   m_ObjectHideFlags: 0
@@ -1275,8 +1275,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1896380407}
   _walkSpeed: 4
-  _runSpeed: 8
-  _runThreshold: 0.7
   _walkF: 1
   _walkZ: 0.7
   _walkR: 0.5

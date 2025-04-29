@@ -10,8 +10,8 @@ public class MovementStateMachine : StateManager<EMovementState>
     [Header("Movement Settings")]
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private float _walkSpeed = 5f;
-    [SerializeField] private float _runSpeed = 8f;
-    [SerializeField] private float _runThreshold = 0.7f;
+    private float _runSpeed = 8f;
+    private float _runThreshold = 0.7f;
     
     [Header("Second Order Parameters - Walk")]
     [SerializeField] private float _walkF = 1f;
@@ -66,8 +66,6 @@ public class MovementStateMachine : StateManager<EMovementState>
                 _context.SpineTarget.localPosition.x, 
                 _context.SpineTarget.localPosition.y, 
                 _context.TargetTransform.localPosition.z);
-            
-           
         }
     }    
     private void FixedUpdate()
