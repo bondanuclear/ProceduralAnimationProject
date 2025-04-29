@@ -1,5 +1,6 @@
 // IdleState.cs
 
+using System.Collections;
 using Modules.Infrastructure.States;
 using UnityEngine;
 namespace Modules.Infrastructure.States.MovementStates
@@ -14,10 +15,25 @@ namespace Modules.Infrastructure.States.MovementStates
         {
             Debug.Log("IdleState EnterState");
             _context.ShouldUpdateSpineTarget = false;
-            _context.SpineIK.weight = 0f;
+            if(_context.SpineIK.weight > 0f)
+            {
+                _context.MonoBehaviour.StartCoroutine(LerpSpineIKWeight(1f, 0f, 1.5f));
+            } 
+            //_context.SpineIK.weight = 0f;
             //_context.SetStateParameters(EMovementState.Idle);
         }
-
+        private IEnumerator LerpSpineIKWeight(float startWeight, float endWeight, float duration)
+        {
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                _context.SpineIK.weight = Mathf.Lerp(startWeight, endWeight, elapsedTime / duration);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            _context.SpineIK.weight = endWeight;
+            _context.SpineTarget.localPosition = _context.SpineTargetOriginalPosition;
+        }
         public override void ExitState()
         {
            Debug.Log("IdleState ExitState");

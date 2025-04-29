@@ -1118,7 +1118,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275433348}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.063014925, y: -0.00017146973, z: -0.000010836222, w: 0.99801266}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0007179864, y: 1.348166, z: 0.022716999}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
@@ -1291,6 +1291,11 @@ MonoBehaviour:
   _stopR: 0.7
   _spineTarget: {fileID: 1275433349}
   _spineIK: {fileID: 1535481794}
+  _spineReturnSpeed: 5
+  _spineStopRotationSpeed: 3
+  _maxSpineStopRotation: 40
+  _bendDuration: 0.5
+  _returnDuration: 0.3
 --- !u!114 &1343974306
 MonoBehaviour:
   m_ObjectHideFlags: 0
