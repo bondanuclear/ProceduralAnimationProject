@@ -1285,7 +1285,7 @@ MonoBehaviour:
   _walkR: 0.5
   _runF: 1
   _runZ: 0.6
-  _runR: 2
+  _runR: 2.2
   _stopF: 0.8
   _stopZ: 0.9
   _stopR: 0.7
