@@ -8,32 +8,32 @@ namespace Modules.Creatures
     {
     
         [Header("Parameters for IK")]
-        [SerializeField] float targetHeight;
-        [SerializeField] Transform targetSphere;
-        [SerializeField] Transform footEnd;
-        [SerializeField] float stepDistance = 3f;
-        [SerializeField] float minStepDistance = 0.1f; // Minimum threshold to prevent jittering
-        [SerializeField] float immediateRepositionDistance = 2f; // Distance threshold for immediate repositioning
+        [SerializeField] private float targetHeight;
+        [SerializeField] private Transform targetSphere;
+        [SerializeField] private Transform footEnd;
+        [SerializeField] private float stepDistance = 3f;
+        [SerializeField] private float minStepDistance = 0.1f; // Minimum threshold to prevent jittering
+        [SerializeField] private float immediateRepositionDistance = 2f; // Distance threshold for immediate repositioning
         
         
-        [SerializeField] LayerMask layerMask;
+        [SerializeField] private LayerMask layerMask;
         
-        Vector3 newPosition;
-        Vector3 currentPosition;
-        float lerp = 1f; // Initialize to 1 to ensure we start in grounded state
+        private Vector3 newPosition;
+        private Vector3 currentPosition;
+        private float lerp = 1f; // Initialize to 1 to ensure we start in grounded state
     
-        [SerializeField] float speedOfLerping = 3f;
-        [SerializeField] float targetRayLength = 0.5f;
-        [SerializeField] Vector3 offset;
+        [SerializeField] private float speedOfLerping = 3f;
+        [SerializeField] private float targetRayLength = 0.5f;
+        [SerializeField] private Vector3 offset;
 
         [Header("Step Animation")]
-        [SerializeField] float stepHeight = 0.5f;
-        [SerializeField] AnimationCurve stepHeightCurve;
+        [SerializeField] private float stepHeight = 0.5f;
+        [SerializeField] private AnimationCurve stepHeightCurve;
         
-        float legOffset = 0;
-        Vector3 startPosition;
-        bool targetValid = false;
-        float lastValidTargetTime = 0f;
+        private float legOffset = 0;
+        private Vector3 startPosition;
+        private bool targetValid = false;
+        private float lastValidTargetTime = 0f;
         
         private void Awake() {
             newPosition = transform.position;
