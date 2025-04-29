@@ -5,6 +5,7 @@ using UnityEngine;
 //using System.Numerics;
 public class SpiderController : MonoBehaviour
 {
+    [SerializeField] private float _distanceTillGroundHit = 0.1f;
     [SerializeField] private float MaxDistance = 0.3f;
     [Header("Ray settings: ")]
     [SerializeField] private Transform rayOrigin;
@@ -24,8 +25,6 @@ public class SpiderController : MonoBehaviour
     [SerializeField] private float gravityMultiplier = 2.5f;
     [SerializeField] private float fallSpeedMax = 20f;
     [SerializeField] private ParticleSystem jumpParticles;
-    [SerializeField] private float landingDampeningTime = 0.3f; // Smooth landing time
-    [SerializeField] private float landingDetectionDistance = 0.5f; // Distance to start preparing for landing
     
     [Header("Parameters of the second order system: ")]
     [SerializeField] private float f;
@@ -43,13 +42,9 @@ public class SpiderController : MonoBehaviour
     // Jump variables
     [SerializeField] private bool isGrounded;
     [SerializeField] private bool isJumping;
-    [SerializeField] private bool isLanding;
     [SerializeField] private float jumpCooldownTimer;
     [SerializeField] private float verticalVelocity;
     [SerializeField] private Vector3 originalTargetPos;
-    private float landingTimer;
-    private float landingStartHeight;
-    private float landingTargetHeight;
     
     private void Start() 
     {
@@ -62,10 +57,7 @@ public class SpiderController : MonoBehaviour
         
         // Initialize jump variables
         isGrounded = true;
-        isJumping = false;
-        isLanding = false;
         jumpCooldownTimer = 0f;
-        landingTimer = 0f;
     }
     
     private void Update() 
@@ -79,9 +71,8 @@ public class SpiderController : MonoBehaviour
         // Check if grounded
         CheckGrounded();
         
-        // Handle jumping and landing
+        // Handle jumping
         HandleJumping();
-        HandleLanding();
             
         // Movement variables
         Vector3 moveDirection = Vector3.zero;
@@ -125,12 +116,16 @@ public class SpiderController : MonoBehaviour
             movementDirection = worldMoveDirection;
         }
         
-        // Update ground height when not jumping or landing
-        if (!isJumping && !isLanding)
+        // Update ground height only when not jumping
+        if (!isJumping)
         {
-            UpdateGroundHeight();
+            if (Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit info, rayLength, layerMask))
+            {
+                targetMovePos.y = info.point.y + distanceFromGround;
+                originalTargetPos = targetMovePos;
+            }
         }
-        else if (isJumping)
+        else
         {
             // Apply gravity to vertical velocity when jumping
             verticalVelocity -= gravityMultiplier * Time.deltaTime;
@@ -139,14 +134,13 @@ public class SpiderController : MonoBehaviour
             // Update vertical position with physics
             targetMovePos.y = originalTargetPos.y + verticalVelocity;
             
-            // Predict landing - start landing process slightly before hitting the ground
-            if (verticalVelocity < 0)
+            // Check if we hit the ground while falling
+            if (verticalVelocity < 0 && Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit groundHit, _distanceTillGroundHit, layerMask))
             {
-                RaycastHit groundHit;
-                if (Physics.Raycast(rayOrigin.position, Vector3.down, out groundHit, landingDetectionDistance, layerMask))
-                {
-                    StartLanding(groundHit.point.y + distanceFromGround);
-                }
+                isJumping = false;
+                verticalVelocity = 0;
+                targetMovePos.y = groundHit.point.y + distanceFromGround;
+                originalTargetPos = targetMovePos;
             }
         }
         
@@ -184,26 +178,9 @@ public class SpiderController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
     }
 
-    private void UpdateGroundHeight()
-    {
-        RaycastHit info;
-        if (Physics.Raycast(rayOrigin.position, Vector3.down, out info, rayLength, layerMask))
-        {
-            float targetHeight = info.point.y + distanceFromGround;
-            
-            // Always ensure the body is at the correct height above ground
-            targetMovePos.y = targetHeight;
-            originalTargetPos = targetMovePos;
-        }
-    }
-    
     private void CheckGrounded()
     {
-        // Only update grounded state when not in landing animation
-        if (!isLanding)
-        {
-            isGrounded = Physics.Raycast(rayOrigin.position, Vector3.down, MaxDistance, layerMask);
-        }
+        isGrounded = Physics.Raycast(rayOrigin.position, Vector3.down, MaxDistance, layerMask);
     }
     
     private void HandleJumping()
@@ -215,7 +192,6 @@ public class SpiderController : MonoBehaviour
             // Set jumping state
             isJumping = true;
             isGrounded = false;
-            isLanding = false;
             jumpCooldownTimer = jumpCooldown;
             
             // Apply jump force
@@ -229,45 +205,6 @@ public class SpiderController : MonoBehaviour
         }
     }
     
-    private void StartLanding(float groundHeight)
-    {
-        isJumping = false;
-        isLanding = true;
-        landingTimer = 0f;
-        landingStartHeight = targetMovePos.y;
-        landingTargetHeight = groundHeight;
-        Debug.Log("Starting landing sequence from " + landingStartHeight + " to " + landingTargetHeight);
-    }
-    
-    private void HandleLanding()
-    {
-        if (isLanding)
-        {
-            landingTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(landingTimer / landingDampeningTime);
-            
-            // Use smooth step for more natural landing
-            float smoothT = Mathf.SmoothStep(0, 1, t);
-            
-            // Interpolate height during landing
-            targetMovePos.y = Mathf.Lerp(landingStartHeight, landingTargetHeight, smoothT);
-            
-            // Landing complete
-            if (t >= 1)
-            {
-                isLanding = false;
-                isGrounded = true;
-                verticalVelocity = 0;
-                originalTargetPos = targetMovePos;
-                
-                // Ensure we're exactly at the target height
-                targetMovePos.y = landingTargetHeight;
-                
-                Debug.Log("Landing complete");
-            }
-        }
-    }
-    
     private void FixedUpdate() 
     {
         // Оновлюємо позицію за методом Верле
@@ -276,14 +213,7 @@ public class SpiderController : MonoBehaviour
     
     private void OnDrawGizmos() {
         Gizmos.DrawWireSphere(rayOrigin.position, 0.1f);
-        Gizmos.DrawRay(rayOrigin.position, rayLength * Vector3.down);
-        
-        // Draw landing detection range
-        if (Application.isPlaying && isJumping)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(rayOrigin.position, Vector3.down * landingDetectionDistance);
-        }
+        Gizmos.DrawRay(rayOrigin.position, rayLength * Vector3.down );
         
         // Draw movement direction if in play mode
         if (Application.isPlaying && movementDirection.magnitude > 0.01f)
@@ -296,16 +226,10 @@ public class SpiderController : MonoBehaviour
             Gizmos.DrawRay(transform.position, transform.forward * 2f);
         }
         
-        // Visualize grounded/jumping/landing state
+        // Visualize grounded state
         if (Application.isPlaying)
         {
-            if (isGrounded)
-                Gizmos.color = Color.green;
-            else if (isJumping)
-                Gizmos.color = Color.red;
-            else if (isLanding)
-                Gizmos.color = Color.yellow;
-                
+            Gizmos.color = isGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(rayOrigin.position - Vector3.up * 0.2f, 0.1f);
         }
     }
