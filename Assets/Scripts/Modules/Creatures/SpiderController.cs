@@ -30,6 +30,12 @@ public class SpiderController : MonoBehaviour
     [SerializeField] private float f;
     [SerializeField] private float z;
     [SerializeField] private float r;
+    [Header("Equation Solver Configuration")]
+    public Modules.Maths.EquationSolverType solverType = Modules.Maths.EquationSolverType.SemiImplicitEuler;
+    public float frequency = 5f;
+    public float damping = 0.5f;
+    public float response = 0.3f;
+    
     private IEquationSolver _equationSolver;
     private Vector3 targetMovePos;
     private Vector3 resultVector;
@@ -46,11 +52,41 @@ public class SpiderController : MonoBehaviour
     [SerializeField] private float verticalVelocity;
     [SerializeField] private Vector3 originalTargetPos;
     
+    void Awake()
+    {
+        // Initialize equation solver based on the configured type
+        InitializeEquationSolver();
+        
+        // ... existing Awake code if any ...
+    }
+    
+    private void InitializeEquationSolver()
+    {
+        // Create the equation solver based on the configured type
+        switch (solverType)
+        {
+            case Modules.Maths.EquationSolverType.EulerStable:
+                _equationSolver = new Modules.Maths.EulerStable(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.EulerStableCorrectPhysics:
+                _equationSolver = new Modules.Maths.EulerStableCorrectPhysics(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.SemiImplicitEuler:
+                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.VerletIntegration:
+                _equationSolver = new Modules.Maths.VerletIntegration(frequency, damping, response, transform.position);
+                break;
+            default:
+                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+                break;
+        }
+        
+        Debug.Log($"Initialized {solverType} solver for {gameObject.name}");
+    }
+    
     private void Start() 
     {
-        _equationSolver = new SemiImplicitEuler(f,z,r, transform.position);
-        //_equationSolver = new EulerStableCorrectPhysics(f,z,r, transform.position);
-        //_equationSolver = new SecondOrderDynamicsVerlet(f, z, r, transform.position, Time.fixedDeltaTime);
         targetMovePos = transform.position;
         originalTargetPos = targetMovePos;
         targetRotation = transform.rotation;

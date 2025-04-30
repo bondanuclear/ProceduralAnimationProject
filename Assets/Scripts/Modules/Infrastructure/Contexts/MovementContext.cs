@@ -32,7 +32,7 @@ public class MovementContext
                           float walkSpeed, float runSpeed,
                           (float f, float z, float r) walkParams,
                           (float f, float z, float r) runParams,
-                          Transform spineTarget, TwoBoneIKConstraint spineIK, MonoBehaviour monoBehaviour)
+                          Transform spineTarget, TwoBoneIKConstraint spineIK, MonoBehaviour monoBehaviour, IEquationSolver equationSolver)
     {
         _characterTransform = characterTransform;
         _characterController = characterController;
@@ -41,7 +41,7 @@ public class MovementContext
         _spineTarget = spineTarget;
         _walkParams = walkParams;
         _runParams = runParams;
-        
+        _equationSolver = equationSolver;
         _spineIK = spineIK;
         _monoBehaviour = monoBehaviour;
         _spineTargetOriginalPosition = spineTarget.transform.localPosition;

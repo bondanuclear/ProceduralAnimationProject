@@ -2,6 +2,7 @@
 using System.Collections;
 using Modules.Infrastructure.States;
 using Modules.Infrastructure.States.MovementStates;
+using Modules.Maths;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 // MovementStateMachine.cs
@@ -12,7 +13,13 @@ public class MovementStateMachine : StateManager<EMovementState>
     [SerializeField] private float _walkSpeed = 5f;
     private float _runSpeed = 8f;
     private float _runThreshold = 0.7f;
+    [Header("Equation Solver Configuration")]
+    public Modules.Maths.EquationSolverType solverType = Modules.Maths.EquationSolverType.SemiImplicitEuler;
+    public float frequency = 5f;
+    public float damping = 0.5f;
+    public float response = 0.3f;
     
+    private IEquationSolver _equationSolver;
     [Header("Second Order Parameters - Walk")]
     [SerializeField] private float _walkF = 1f;
     [SerializeField] private float _walkZ = 0.7f;
@@ -30,6 +37,9 @@ public class MovementStateMachine : StateManager<EMovementState>
     private MovementContext _context;
     private void Awake()
     {
+        // Initialize equation solver based on the configured type
+        InitializeEquationSolver();
+        
         // Create context with parameters
         _context = new MovementContext(
             transform,
@@ -40,11 +50,37 @@ public class MovementStateMachine : StateManager<EMovementState>
             (_runF, _runZ, _runR),
             _spineTarget,
             _spineIK,
-            this
+            this,
+            _equationSolver
         );
         
         // Initialize states
         InitializeStates();
+    }
+    
+    private void InitializeEquationSolver()
+    {
+        // Create the equation solver based on the configured type
+        switch (solverType)
+        {
+            case Modules.Maths.EquationSolverType.EulerStable:
+                _equationSolver = new Modules.Maths.EulerStable(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.EulerStableCorrectPhysics:
+                _equationSolver = new Modules.Maths.EulerStableCorrectPhysics(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.SemiImplicitEuler:
+                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+                break;
+            case Modules.Maths.EquationSolverType.VerletIntegration:
+                _equationSolver = new Modules.Maths.VerletIntegration(frequency, damping, response, transform.position);
+                break;
+            default:
+                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+                break;
+        }
+        
+        Debug.Log($"Initialized {solverType} solver for MovementStateMachine on {gameObject.name}");
     }
     
     private void InitializeStates()

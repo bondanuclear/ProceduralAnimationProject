@@ -336,7 +336,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 1103897712}
+    TrackingTarget: {fileID: 0}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -601,7 +601,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1033686301}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1001 &1103897711
+--- !u!1001 &1256175667
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -612,10 +612,6 @@ PrefabInstance:
     - target: {fileID: 3893879661402882019, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
       propertyPath: m_Name
       value: BananaManProcedural
-      objectReference: {fileID: 0}
-    - target: {fileID: 4033675397626666209, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4568071842543576389, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -657,16 +653,39 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6175946584198570400, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3893879661402882019, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1256175669}
   m_SourcePrefab: {fileID: 100100000, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
---- !u!4 &1103897712 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4568071842543576389, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
-  m_PrefabInstance: {fileID: 1103897711}
+--- !u!1 &1256175668 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3893879661402882019, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+  m_PrefabInstance: {fileID: 1256175667}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1256175669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256175668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e14502f7b05524480a362ea2717064fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  solverType: 3
+  frequency: 5
+  damping: 0.5
+  response: 0.3
 --- !u!1 &1321272379
 GameObject:
   m_ObjectHideFlags: 0
@@ -1004,4 +1023,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 965474211}
   - {fileID: 994293809}
-  - {fileID: 1103897711}
+  - {fileID: 1256175667}

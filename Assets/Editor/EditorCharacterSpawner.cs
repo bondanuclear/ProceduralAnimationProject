@@ -1,9 +1,19 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using Modules.Maths;
 
 public class EditorCharacterSpawner : EditorWindow
 {
+    // Enum for equation solver types that matches what we need
+    public enum EquationSolverType
+    {
+        EulerStable,
+        EulerStableCorrectPhysics,
+        SemiImplicitEuler,
+        VerletIntegration
+    }
+    
     private GameObject humanPrefab;
     private GameObject spiderPrefab;
     private CharacterType selectedCharacterType = CharacterType.Human;
@@ -25,12 +35,25 @@ public class EditorCharacterSpawner : EditorWindow
     private Dictionary<string, bool> customRigs = new Dictionary<string, bool>();
     private List<string> availableRigs = new List<string>();
     private Vector2 rigScrollPosition;
+    
+    // For equation solver selection
+    private bool showEquationSolverSettings = true;
+    private Modules.Maths.EquationSolverType selectedEquationSolverType = Modules.Maths.EquationSolverType.SemiImplicitEuler;
+    private Dictionary<string, Modules.Maths.EquationSolverType> rigSolverTypes = new Dictionary<string, Modules.Maths.EquationSolverType>();
+    
+    // Equation solver parameters
+    private bool showSolverParameters = true;
+    private float frequency = 5f;
+    private float damping = 0.5f;
+    private float response = 0.3f;
+    private Vector3 initialPosition = Vector3.zero;
+    private Dictionary<string, Modules.Maths.EquationSolverParameters> rigSolverParameters = new Dictionary<string, Modules.Maths.EquationSolverParameters>();
 
     [MenuItem("Tools/Character Spawner")]
     public static void ShowWindow()
     {
         EditorCharacterSpawner window = GetWindow<EditorCharacterSpawner>("Character Spawner");
-        window.minSize = new Vector2(300, 250);
+        window.minSize = new Vector2(300, 300);
     }
 
     private void OnEnable()
@@ -146,6 +169,19 @@ public class EditorCharacterSpawner : EditorWindow
                         if (!customRigs.ContainsKey(rigName))
                         {
                             customRigs[rigName] = true;
+                        }
+                        
+                        // Set default equation solver for this rig
+                        if (!rigSolverTypes.ContainsKey(rigName))
+                        {
+                            rigSolverTypes[rigName] = Modules.Maths.EquationSolverType.SemiImplicitEuler;
+                        }
+                        
+                        // Set default solver parameters for this rig
+                        if (!rigSolverParameters.ContainsKey(rigName))
+                        {
+                            rigSolverParameters[rigName] = new Modules.Maths.EquationSolverParameters(
+                                frequency, damping, response, initialPosition);
                         }
                     }
                 }
@@ -292,6 +328,115 @@ public class EditorCharacterSpawner : EditorWindow
             }
             
             EditorGUILayout.EndVertical();
+            
+            // Equation Solver Settings
+            EditorGUILayout.Space();
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            
+            // Foldout for equation solver settings
+            showEquationSolverSettings = EditorGUILayout.Foldout(showEquationSolverSettings, "Equation Solver Settings", true, EditorStyles.foldoutHeader);
+            
+            if (showEquationSolverSettings)
+            {
+                EditorGUI.indentLevel++;
+                
+                // Global solver selection
+                EditorGUILayout.LabelField("Default Equation Solver:", EditorStyles.boldLabel);
+                selectedEquationSolverType = (Modules.Maths.EquationSolverType)EditorGUILayout.EnumPopup("Solver Type", selectedEquationSolverType);
+                
+                // Solver parameters
+                showSolverParameters = EditorGUILayout.Foldout(showSolverParameters, "Solver Parameters", true);
+                if (showSolverParameters)
+                {
+                    EditorGUI.indentLevel++;
+                    
+                    frequency = EditorGUILayout.Slider("Frequency", frequency, 0.1f, 20f);
+                    damping = EditorGUILayout.Slider("Damping", damping, 0f, 2f);
+                    response = EditorGUILayout.Slider("Response", response, 0.1f, 5f);
+                    initialPosition = EditorGUILayout.Vector3Field("Initial Position", initialPosition);
+                    
+                    if (GUILayout.Button("Apply Parameters to All Rigs"))
+                    {
+                        foreach (string rigName in availableRigs)
+                        {
+                            rigSolverParameters[rigName] = new Modules.Maths.EquationSolverParameters(
+                                frequency, damping, response, initialPosition);
+                        }
+                    }
+                    
+                    EditorGUI.indentLevel--;
+                }
+                
+                if (GUILayout.Button("Apply Solver Type to All Rigs"))
+                {
+                    foreach (string rigName in availableRigs)
+                    {
+                        rigSolverTypes[rigName] = selectedEquationSolverType;
+                    }
+                }
+                
+                // Per-rig solver selection
+                if (availableRigs.Count > 0)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Per-Rig Equation Solvers:", EditorStyles.boldLabel);
+                    
+                    foreach (string rigName in availableRigs)
+                    {
+                        // Only show solver selection for enabled rigs
+                        if (customRigs.ContainsKey(rigName) && customRigs[rigName])
+                        {
+                            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                            
+                            EditorGUILayout.LabelField(rigName, EditorStyles.boldLabel);
+                            
+                            // Solver type selection
+                            rigSolverTypes[rigName] = (Modules.Maths.EquationSolverType)EditorGUILayout.EnumPopup(
+                                "Solver Type", 
+                                rigSolverTypes.ContainsKey(rigName) ? rigSolverTypes[rigName] : selectedEquationSolverType
+                            );
+                            
+                            // Get current parameters
+                            Modules.Maths.EquationSolverParameters currentParams = rigSolverParameters.ContainsKey(rigName) 
+                                ? rigSolverParameters[rigName] 
+                                : new Modules.Maths.EquationSolverParameters(frequency, damping, response, initialPosition);
+                            
+                            // Parameter fields
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Frequency", GUILayout.Width(80));
+                            float newFrequency = EditorGUILayout.Slider(currentParams.Frequency, 0.1f, 20f);
+                            EditorGUILayout.EndHorizontal();
+                            
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Damping", GUILayout.Width(80));
+                            float newDamping = EditorGUILayout.Slider(currentParams.Damping, 0f, 2f);
+                            EditorGUILayout.EndHorizontal();
+                            
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Response", GUILayout.Width(80));
+                            float newResponse = EditorGUILayout.Slider(currentParams.Response, 0.1f, 5f);
+                            EditorGUILayout.EndHorizontal();
+                            
+                            // Update parameters if changed
+                            if (newFrequency != currentParams.Frequency || 
+                                newDamping != currentParams.Damping || 
+                                newResponse != currentParams.Response)
+                            {
+                                rigSolverParameters[rigName] = new Modules.Maths.EquationSolverParameters(
+                                    newFrequency, newDamping, newResponse, currentParams.InitialPosition);
+                            }
+                            
+                            EditorGUILayout.EndVertical();
+                            EditorGUILayout.Space();
+                        }
+                    }
+                }
+                
+                EditorGUI.indentLevel--;
+            }
+            
+            EditorGUILayout.EndVertical();
         }
         
         // Spawn settings
@@ -360,64 +505,48 @@ public class EditorCharacterSpawner : EditorWindow
     
     private void SpawnCharacter()
     {
-        // Get the prefab to spawn
-        GameObject prefabToSpawn = selectedCharacterType == CharacterType.Human ? humanPrefab : spiderPrefab;
+        GameObject prefabToSpawn = GetSelectedPrefab();
         
         if (prefabToSpawn == null)
         {
-            Debug.LogError($"Prefab for {selectedCharacterType} is not assigned!");
+            EditorUtility.DisplayDialog("Error", "No prefab selected to spawn.", "OK");
             return;
         }
         
         // Determine spawn position
-        Vector3 position;
-        if (useCustomPosition)
+        Vector3 position = useCustomPosition ? spawnPosition : (spawnPoint != null ? spawnPoint.position : Vector3.zero);
+        
+        // Instantiate the character
+        GameObject character = PrefabUtility.InstantiatePrefab(prefabToSpawn) as GameObject;
+        if (character != null)
         {
-            position = spawnPosition;
-        }
-        else if (spawnPoint != null)
-        {
-            position = spawnPoint.position;
+            // Configure equation solver before moving the character to prevent Awake from using default values
+            ConfigureEquationSolver(character);
+            
+            // Now move the character (this shouldn't trigger Awake again)
+            character.transform.position = position;
+            Undo.RegisterCreatedObjectUndo(character, "Spawn Character");
+            
+            // Configure procedural animation rigs
+            ConfigureProceduralRigs(character);
+            
+            // Add the EquationSolverController component for runtime editing
+            AddEquationSolverController(character);
+            
+            Debug.Log($"Spawned {selectedCharacterType} character at {position}");
+            
+            // Select the spawned character
+            Selection.activeGameObject = character;
         }
         else
         {
-            // Use scene view camera position if no spawn point is set
-            if (SceneView.lastActiveSceneView != null)
-            {
-                position = SceneView.lastActiveSceneView.camera.transform.position + 
-                          SceneView.lastActiveSceneView.camera.transform.forward * 2f;
-                position.y = 0.5f; // Place at a reasonable height
-            }
-            else
-            {
-                position = spawnPosition;
-            }
+            Debug.LogError("Failed to instantiate character prefab.");
         }
-        
-        // Create the object
-        GameObject spawnedObject = (GameObject)PrefabUtility.InstantiatePrefab(prefabToSpawn);
-        Undo.RegisterCreatedObjectUndo(spawnedObject, "Spawn Character");
-        
-        // Position the object
-        spawnedObject.transform.position = position;
-        spawnedObject.transform.rotation = Quaternion.identity;
-        
-        // For human characters, handle the procedural animation rigs
-        if (selectedCharacterType == CharacterType.Human)
-        {
-            ConfigureProceduralRigs(spawnedObject);
-        }
-        
-        // Select the spawned object
-        Selection.activeGameObject = spawnedObject;
-        
-        // Focus the scene view on the spawned object
-        if (SceneView.lastActiveSceneView != null)
-        {
-            SceneView.lastActiveSceneView.FrameSelected();
-        }
-        
-        Debug.Log($"Spawned {selectedCharacterType} character at {position}");
+    }
+    
+    private GameObject GetSelectedPrefab()
+    {
+        return selectedCharacterType == CharacterType.Human ? humanPrefab : spiderPrefab;
     }
     
     private void ConfigureProceduralRigs(GameObject character)
@@ -433,6 +562,12 @@ public class EditorCharacterSpawner : EditorWindow
                     // Enable or disable the rig based on user selection
                     child.gameObject.SetActive(customRigs[child.name]);
                     
+                    // Only set solver for enabled rigs
+                    if (customRigs[child.name] && rigSolverTypes.ContainsKey(child.name))
+                    {
+                        SetRigEquationSolver(child.gameObject, rigSolverTypes[child.name]);
+                    }
+                    
                     if (customRigs[child.name])
                     {
                         Debug.Log($"Enabled procedural animation rig: {child.name}");
@@ -443,6 +578,306 @@ public class EditorCharacterSpawner : EditorWindow
                     }
                 }
             }
+            
+            // Also set equation solver in MovementContext if it exists
+            //SetMovementContextSolver(character, selectedEquationSolverType);
+        }
+    }
+    
+    private void ConfigureEquationSolver(GameObject character)
+    {
+        if (selectedCharacterType == CharacterType.Human)
+        {
+            // For human characters, configure equation solver
+            ConfigureSpiderEquationSolver(character);
+        }
+        else if (selectedCharacterType == CharacterType.Spider)
+        {
+            // For spider characters, configure equation solver
+            ConfigureSpiderEquationSolver(character);
+        }
+    }
+    
+    private void ConfigureSpiderEquationSolver(GameObject spiderObject)
+    {
+        if (spiderObject != null)
+        {
+            // Set solver properties directly on the SpiderController
+            var spiderController = spiderObject.GetComponent<SpiderController>();
+            if (spiderController != null)
+            {
+                // Set the parameters directly instead of using reflection
+                spiderController.solverType = selectedEquationSolverType;
+                spiderController.frequency = frequency;
+                spiderController.damping = damping;
+                spiderController.response = response;
+                
+                // Force reinitialize the equation solver with the new settings
+                if (Application.isPlaying)
+                {
+                    // If playing, call the public method
+                    spiderController.InitializeEquationSolver();
+                }
+                else
+                {
+                    // In editor, we use reflection to call the method even if it's private
+                    var method = spiderController.GetType().GetMethod("InitializeEquationSolver", 
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (method != null)
+                    {
+                        method.Invoke(spiderController, null);
+                    }
+                }
+                
+                Debug.Log($"Configured {selectedEquationSolverType} equation solver on SpiderController with parameters " +
+                    $"(f={frequency}, d={damping}, r={response})");
+            }
+            
+            // Also set it on the MovementStateMachine if it exists
+            var movementStateMachine = spiderObject.GetComponent<MovementStateMachine>();
+            if (movementStateMachine != null)
+            {
+                // Set the parameters directly
+                movementStateMachine.solverType = selectedEquationSolverType;
+                movementStateMachine.frequency = frequency;
+                movementStateMachine.damping = damping;
+                movementStateMachine.response = response;
+                
+                // Force reinitialize the equation solver with the new settings
+                if (Application.isPlaying)
+                {
+                    // If playing, call the public method
+                    movementStateMachine.InitializeEquationSolver();
+                }
+                else
+                {
+                    // In editor, we use reflection to call the method even if it's private
+                    var method = movementStateMachine.GetType().GetMethod("InitializeEquationSolver", 
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (method != null)
+                    {
+                        method.Invoke(movementStateMachine, null);
+                    }
+                }
+                
+                Debug.Log($"Configured {selectedEquationSolverType} equation solver on MovementStateMachine with parameters " +
+                    $"(f={frequency}, d={damping}, r={response})");
+            }
+        }
+    }
+    
+    private void SetRigEquationSolver(GameObject rig, Modules.Maths.EquationSolverType solverType)
+    {
+        // Here we use reflection to find components that might use an equation solver
+        // Look for components that might have equation solver fields
+        Component[] components = rig.GetComponents<Component>();
+        string rigName = rig.name;
+        
+        // Get parameters for this rig
+        Modules.Maths.EquationSolverParameters parameters = rigSolverParameters.ContainsKey(rigName)
+            ? rigSolverParameters[rigName]
+            : new Modules.Maths.EquationSolverParameters(frequency, damping, response, initialPosition);
+        
+        bool solverSet = false;
+        
+        foreach (Component component in components)
+        {
+            if (component == null) continue;
+            
+            System.Type type = component.GetType();
+            
+            // Check for fields that might be equation solvers
+            foreach (var field in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+            {
+                if (field.FieldType == typeof(IEquationSolver))
+                {
+                    field.SetValue(component, Modules.Maths.EquationSolverFactory.CreateSolver(solverType, parameters));
+                    Debug.Log($"Set {solverType} equation solver on {component.GetType().Name}.{field.Name} with parameters " +
+                        $"(f={parameters.Frequency}, d={parameters.Damping}, r={parameters.Response})");
+                    solverSet = true;
+                }
+            }
+        }
+        
+        if (!solverSet)
+        {
+            // If we couldn't find a direct field, look for methods that might set the solver
+            foreach (Component component in components)
+            {
+                if (component == null) continue;
+                
+                System.Type type = component.GetType();
+                
+                foreach (var method in type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                {
+                    if ((method.Name.Contains("SetSolver") || method.Name.Contains("SetEquationSolver")) && 
+                        method.GetParameters().Length == 1 && 
+                        method.GetParameters()[0].ParameterType == typeof(IEquationSolver))
+                    {
+                        method.Invoke(component, new object[] { Modules.Maths.EquationSolverFactory.CreateSolver(solverType, parameters) });
+                        Debug.Log($"Set {solverType} equation solver using {component.GetType().Name}.{method.Name} with parameters " +
+                            $"(f={parameters.Frequency}, d={parameters.Damping}, r={parameters.Response})");
+                        solverSet = true;
+                    }
+                }
+            }
+        }
+    }
+    
+    private void SetMovementContextSolver(GameObject character, Modules.Maths.EquationSolverType solverType)
+    {
+        // Try to find a component named MovementContext or similar
+        Component[] components = character.GetComponentsInChildren<Component>();
+        
+        // Create parameters for movement context
+        Modules.Maths.EquationSolverParameters parameters = new Modules.Maths.EquationSolverParameters(
+            frequency, damping, response, initialPosition);
+        
+        foreach (Component component in components)
+        {
+            if (component == null) continue;
+            
+            System.Type type = component.GetType();
+            if (type.Name.Contains("MovementContext"))
+            {
+                SetFieldOnComponent(component, "equationSolver", 
+                    Modules.Maths.EquationSolverFactory.CreateSolver(solverType, parameters));
+                Debug.Log($"Set {solverType} equation solver on {type.Name} with parameters " +
+                    $"(f={parameters.Frequency}, d={parameters.Damping}, r={parameters.Response})");
+            }
+        }
+    }
+    
+    private bool SetFieldOnComponent(Component component, string fieldName, object value)
+    {
+        if (component == null) return false;
+        
+        System.Type type = component.GetType();
+        
+        try
+        {
+            // Try to find field with exact name first
+            var field = type.GetField(fieldName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+            if (field != null && field.FieldType.IsAssignableFrom(value.GetType()))
+            {
+                field.SetValue(component, value);
+                return true;
+            }
+            
+            // If not found, try to find fields that match the expected type
+            var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+            foreach (var f in fields)
+            {
+                if (f.FieldType.IsAssignableFrom(value.GetType()) && 
+                    (f.Name.ToLower().Contains("solver") || f.Name.ToLower().Contains("equation")))
+                {
+                    f.SetValue(component, value);
+                    return true;
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error setting field on {type.Name}: {e.Message}");
+        }
+        
+        return false;
+    }
+    
+    // Create appropriate solver based on the selected type
+    private IEquationSolver CreateSolver(EquationSolverType solverType)
+    {
+        switch (solverType)
+        {
+            case EquationSolverType.EulerStable:
+                return new EulerStableSolver();
+            case EquationSolverType.EulerStableCorrectPhysics:
+                return new EulerStableCorrectPhysicsSolver();
+            case EquationSolverType.SemiImplicitEuler:
+                return new SemiImplicitEulerSolver();
+            case EquationSolverType.VerletIntegration:
+                return new VerletIntegrationSolver();
+            default:
+                return new EulerStableSolver();
+        }
+    }
+    
+    // Solver implementations
+    private class EulerStableSolver : IEquationSolver
+    {
+        public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
+        {
+            Vector3 velocity = xd ?? Vector3.zero;
+            Vector3 acceleration = (T == Mathf.Infinity) ? Vector3.zero : (x - velocity * T) / (T * T);
+            return x + velocity * Time.deltaTime;
+        }
+    }
+    
+    private class EulerStableCorrectPhysicsSolver : IEquationSolver
+    {
+        public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
+        {
+            Vector3 velocity = xd ?? Vector3.zero;
+            Vector3 acceleration = (T == Mathf.Infinity) ? Vector3.zero : (x - velocity * T) / (T * T);
+            return x + velocity * Time.deltaTime + 0.5f * acceleration * Time.deltaTime * Time.deltaTime;
+        }
+    }
+    
+    private class SemiImplicitEulerSolver : IEquationSolver
+    {
+        public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
+        {
+            Vector3 velocity = xd ?? Vector3.zero;
+            Vector3 acceleration = (T == Mathf.Infinity) ? Vector3.zero : (x - velocity * T) / (T * T);
+            Vector3 newVelocity = velocity + acceleration * Time.deltaTime;
+            return x + newVelocity * Time.deltaTime;
+        }
+    }
+    
+    private class VerletIntegrationSolver : IEquationSolver
+    {
+        private Vector3 previousPosition;
+        private bool initialized = false;
+        
+        public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
+        {
+            Vector3 velocity = xd ?? Vector3.zero;
+            Vector3 acceleration = (T == Mathf.Infinity) ? Vector3.zero : (x - velocity * T) / (T * T);
+            
+            if (!initialized)
+            {
+                previousPosition = x - velocity * Time.deltaTime;
+                initialized = true;
+            }
+            
+            Vector3 newPosition = 2 * x - previousPosition + acceleration * Time.deltaTime * Time.deltaTime;
+            previousPosition = x;
+            
+            return newPosition;
+        }
+    }
+    
+    private void AddEquationSolverController(GameObject character)
+    {
+        // With the direct public property approach, we don't need the EquationSolverController anymore
+        // But let's keep it for backward compatibility and debugging
+        
+        // Check if it already has the component
+        var existingController = character.GetComponent<EquationSolverController>();
+        if (existingController == null)
+        {
+            // Add the EquationSolverController component
+            var controller = character.AddComponent<EquationSolverController>();
+            
+            // Set values directly
+            controller.solverType = selectedEquationSolverType;
+            controller.frequency = frequency;
+            controller.damping = damping;
+            controller.response = response;
+            
+            Debug.Log($"Added EquationSolverController to {character.name} with {selectedEquationSolverType} solver type");
         }
     }
 } 
