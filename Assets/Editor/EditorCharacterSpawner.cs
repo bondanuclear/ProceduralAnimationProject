@@ -16,18 +16,30 @@ public class EditorCharacterSpawner : EditorWindow
     private List<GameObject> availableSpiderPrefabs = new List<GameObject>();
     private int selectedHumanIndex = 0;
     private int selectedSpiderIndex = 0;
+    
+    // For procedural animation rigs
+    private bool showProceduralSettings = true;
+    private bool enableMovementRig = true;
+    private bool enableHeadTrackingRig = true;
+    private bool enableEnvironmentInteractionRig = true;
+    private Dictionary<string, bool> customRigs = new Dictionary<string, bool>();
+    private List<string> availableRigs = new List<string>();
+    private Vector2 rigScrollPosition;
 
     [MenuItem("Tools/Character Spawner")]
     public static void ShowWindow()
     {
         EditorCharacterSpawner window = GetWindow<EditorCharacterSpawner>("Character Spawner");
-        window.minSize = new Vector2(300, 200);
+        window.minSize = new Vector2(300, 250);
     }
 
     private void OnEnable()
     {
         // Try to find prefabs automatically
         FindPrefabs();
+        
+        // Scan for available procedural rigs in the human prefab
+        ScanForProceduralRigs();
     }
     
     private void FindPrefabs()
@@ -72,7 +84,7 @@ public class EditorCharacterSpawner : EditorWindow
             
             if (prefab != null)
             {
-                if (filename.Contains("human") || filename.Contains("player"))
+                if (filename.Contains("human") || filename.Contains("player") || filename.Contains("man"))
                 {
                     availableHumanPrefabs.Add(prefab);
                     if (humanPrefab == prefab)
@@ -104,6 +116,44 @@ public class EditorCharacterSpawner : EditorWindow
             selectedSpiderIndex = 0;
             spiderPrefab = availableSpiderPrefabs[0];
         }
+        
+        // Scan for rigs whenever prefabs change
+        ScanForProceduralRigs();
+    }
+    
+    private void ScanForProceduralRigs()
+    {
+        availableRigs.Clear();
+        customRigs.Clear();
+        
+        // Check if we have a human prefab to scan
+        if (humanPrefab != null)
+        {
+            // Use PrefabUtility to get prefab contents
+            GameObject tempInstance = PrefabUtility.InstantiatePrefab(humanPrefab) as GameObject;
+            if (tempInstance != null)
+            {
+                // Get all transform children and look for those ending with "Rig"
+                Transform[] allChildren = tempInstance.GetComponentsInChildren<Transform>(true);
+                foreach (Transform child in allChildren)
+                {
+                    if (child.name.EndsWith("Rig"))
+                    {
+                        string rigName = child.name;
+                        availableRigs.Add(rigName);
+                        
+                        // Set default state (enabled)
+                        if (!customRigs.ContainsKey(rigName))
+                        {
+                            customRigs[rigName] = true;
+                        }
+                    }
+                }
+                
+                // Clean up the temporary instance
+                DestroyImmediate(tempInstance);
+            }
+        }
     }
 
     private void OnGUI()
@@ -113,7 +163,14 @@ public class EditorCharacterSpawner : EditorWindow
 
         // Character selection
         EditorGUILayout.LabelField("Select Character Type:", EditorStyles.boldLabel);
+        
+        EditorGUI.BeginChangeCheck();
         selectedCharacterType = (CharacterType)EditorGUILayout.EnumPopup("Character Type", selectedCharacterType);
+        if (EditorGUI.EndChangeCheck())
+        {
+            // If character type changed, re-scan for rigs
+            ScanForProceduralRigs();
+        }
         
         // Prefab assignments
         EditorGUILayout.Space();
@@ -139,6 +196,7 @@ public class EditorCharacterSpawner : EditorWindow
             {
                 selectedHumanIndex = newHumanIndex;
                 humanPrefab = availableHumanPrefabs[selectedHumanIndex];
+                ScanForProceduralRigs(); // Re-scan for rigs when human prefab changes
             }
         }
         GUILayout.EndHorizontal();
@@ -174,6 +232,66 @@ public class EditorCharacterSpawner : EditorWindow
         if (GUILayout.Button("Refresh Prefab List"))
         {
             FindPrefabs();
+        }
+        
+        // Procedural Animation Rig Settings (only for Human)
+        if (selectedCharacterType == CharacterType.Human)
+        {
+            EditorGUILayout.Space();
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            
+            // Foldout for procedural animation settings
+            showProceduralSettings = EditorGUILayout.Foldout(showProceduralSettings, "Procedural Animation Settings", true, EditorStyles.foldoutHeader);
+            
+            if (showProceduralSettings)
+            {
+                EditorGUI.indentLevel++;
+                
+                if (availableRigs.Count == 0)
+                {
+                    EditorGUILayout.HelpBox("No procedural animation rigs found in the selected human prefab.", MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("Enable/Disable Procedural Animation Rigs:", EditorStyles.boldLabel);
+                    
+                    // Begin scroll view for rigs
+                    rigScrollPosition = EditorGUILayout.BeginScrollView(rigScrollPosition, GUILayout.MaxHeight(150));
+                    
+                    // Show toggle for each available rig
+                    foreach (string rigName in availableRigs)
+                    {
+                        customRigs[rigName] = EditorGUILayout.Toggle(rigName, customRigs[rigName]);
+                    }
+                    
+                    EditorGUILayout.EndScrollView();
+                    
+                    if (GUILayout.Button("Toggle All Rigs"))
+                    {
+                        bool anyEnabled = false;
+                        foreach (var rig in customRigs)
+                        {
+                            if (rig.Value)
+                            {
+                                anyEnabled = true;
+                                break;
+                            }
+                        }
+                        
+                        // If any are enabled, disable all; otherwise enable all
+                        bool newState = !anyEnabled;
+                        foreach (string rigName in availableRigs)
+                        {
+                            customRigs[rigName] = newState;
+                        }
+                    }
+                }
+                
+                EditorGUI.indentLevel--;
+            }
+            
+            EditorGUILayout.EndVertical();
         }
         
         // Spawn settings
@@ -284,6 +402,12 @@ public class EditorCharacterSpawner : EditorWindow
         spawnedObject.transform.position = position;
         spawnedObject.transform.rotation = Quaternion.identity;
         
+        // For human characters, handle the procedural animation rigs
+        if (selectedCharacterType == CharacterType.Human)
+        {
+            ConfigureProceduralRigs(spawnedObject);
+        }
+        
         // Select the spawned object
         Selection.activeGameObject = spawnedObject;
         
@@ -294,5 +418,31 @@ public class EditorCharacterSpawner : EditorWindow
         }
         
         Debug.Log($"Spawned {selectedCharacterType} character at {position}");
+    }
+    
+    private void ConfigureProceduralRigs(GameObject character)
+    {
+        if (character != null)
+        {
+            // Get all transform children and configure those that end with "Rig"
+            Transform[] allChildren = character.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in allChildren)
+            {
+                if (child.name.EndsWith("Rig") && customRigs.ContainsKey(child.name))
+                {
+                    // Enable or disable the rig based on user selection
+                    child.gameObject.SetActive(customRigs[child.name]);
+                    
+                    if (customRigs[child.name])
+                    {
+                        Debug.Log($"Enabled procedural animation rig: {child.name}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Disabled procedural animation rig: {child.name}");
+                    }
+                }
+            }
+        }
     }
 } 

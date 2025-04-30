@@ -1115,10 +1115,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BananaManProcedural
       objectReference: {fileID: 0}
-    - target: {fileID: 4033675397626666209, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4568071842543576389, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.051404476

@@ -1272,7 +1272,7 @@ GameObject:
   - component: {fileID: 290996701892549198}
   - component: {fileID: 8554840921565933761}
   m_Layer: 8
-  m_Name: HeadRig
+  m_Name: HeadPart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2313,7 +2313,7 @@ GameObject:
   - component: {fileID: 4812558357906858444}
   - component: {fileID: 2820123499915744414}
   m_Layer: 8
-  m_Name: Movement
+  m_Name: MovementRig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
