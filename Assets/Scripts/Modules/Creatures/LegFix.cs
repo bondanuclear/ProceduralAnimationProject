@@ -56,6 +56,7 @@ namespace Modules.Creatures
         {
             // Update target sphere position based on ground raycast
             targetValid = false;
+            
             if(Physics.Raycast(targetSphere.position + offset, Vector3.down, out RaycastHit targetInfo, targetRayLength, layerMask))
             {
                 targetSphere.position = targetInfo.point;
