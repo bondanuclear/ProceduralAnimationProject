@@ -211,7 +211,8 @@ public class SpiderController : MonoBehaviour
             // Play particles if assigned
             if (jumpParticles != null)
             {
-                jumpParticles.Play();
+                ParticleSystem particles = Instantiate(jumpParticles, transform.position, Quaternion.identity);
+                particles.Play();
             }
         }
     }
