@@ -2149,22 +2149,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
-      propertyPath: jumpForce
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
-      propertyPath: jumpParticles
-      value: 
-      objectReference: {fileID: 4891440538664600065, guid: 82066d902ed0dd6488ddfd32eb994801, type: 3}
-    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
-      propertyPath: _distanceTillGroundHit
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
-      propertyPath: climbableLayers.m_Bits
-      value: 65
-      objectReference: {fileID: 0}
     - target: {fileID: 5826984832034546386, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: m_Name
       value: Player

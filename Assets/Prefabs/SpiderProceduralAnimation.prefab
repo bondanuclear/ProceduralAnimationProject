@@ -1202,7 +1202,7 @@ GameObject:
   - component: {fileID: 9124853519976008911}
   - component: {fileID: 2097972959}
   m_Layer: 0
-  m_Name: Player
+  m_Name: SpiderProceduralAnimation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1236,6 +1236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d240fb687c877945aaa402d8c96a0ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _distanceTillGroundHit: 1
   MaxDistance: 0.7
   rayOrigin: {fileID: 45831138}
   rayLength: 3
@@ -1248,11 +1249,11 @@ MonoBehaviour:
   rotatingSpeed: 50
   autoRotateTowardsMovement: 1
   rotationSmoothTime: 0.1
-  jumpForce: 2
+  jumpForce: 3
   jumpCooldown: 0.5
   gravityMultiplier: 2.5
   fallSpeedMax: 20
-  jumpParticles: {fileID: 0}
+  jumpParticles: {fileID: 4891440538664600065, guid: 82066d902ed0dd6488ddfd32eb994801, type: 3}
   f: 0.8
   z: 0.4
   r: 1
