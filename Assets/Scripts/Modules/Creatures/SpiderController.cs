@@ -60,62 +60,29 @@ public class SpiderController : MonoBehaviour
         jumpCooldownTimer = 0f;
     }
     
-    private void Update() 
+    private void Update()
     {
+        // Movement variables
+        Vector3 moveDirection = Vector3.zero;
+        bool hasMovementInput = false;
+        // Check if grounded
+        CheckGrounded();
+        ProcessMovement(ref moveDirection, ref hasMovementInput);
+        ProcessJumping();
+        ProcessRotation(moveDirection, hasMovementInput);
+    }
+
+    private void ProcessJumping()
+    {
+      
         // Update jump cooldown timer
         if (jumpCooldownTimer > 0)
         {
             jumpCooldownTimer -= Time.deltaTime;
         }
-        
-        // Check if grounded
-        CheckGrounded();
-        
-        // Handle jumping
+          // Handle jumping
         HandleJumping();
-            
-        // Movement variables
-        Vector3 moveDirection = Vector3.zero;
-        bool hasMovementInput = false;
-        
-        // Process movement input - now relative to rotation
-        if (Input.GetKey(KeyCode.W)) 
-        {
-            moveDirection += Vector3.forward;
-            hasMovementInput = true;
-        }
-        else if (Input.GetKey(KeyCode.S)) 
-        {
-            moveDirection += Vector3.back;
-            hasMovementInput = true;
-        }
-        
-        if (Input.GetKey(KeyCode.A)) 
-        {
-            moveDirection += Vector3.left;
-            hasMovementInput = true;
-        }
-        else if (Input.GetKey(KeyCode.D)) 
-        {
-            moveDirection += Vector3.right;
-            hasMovementInput = true;
-        }
-        
-        // Normalize for consistent speed in all directions
-        if (moveDirection.magnitude > 0)
-        {
-            moveDirection.Normalize();
-            
-            // Convert local direction to world space based on current rotation
-            Vector3 worldMoveDirection = transform.TransformDirection(moveDirection);
-            
-            // Set the target position based on rotation
-            targetMovePos += worldMoveDirection * Time.deltaTime * speed;
-            
-            // Store movement direction for auto-rotation
-            movementDirection = worldMoveDirection;
-        }
-        
+
         // Update ground height only when not jumping
         if (!isJumping)
         {
@@ -130,10 +97,10 @@ public class SpiderController : MonoBehaviour
             // Apply gravity to vertical velocity when jumping
             verticalVelocity -= gravityMultiplier * Time.deltaTime;
             verticalVelocity = Mathf.Max(verticalVelocity, -fallSpeedMax);
-            
+
             // Update vertical position with physics
             targetMovePos.y = originalTargetPos.y + verticalVelocity;
-            
+
             // Check if we hit the ground while falling
             if (verticalVelocity < 0 && Physics.Raycast(rayOrigin.position, Vector3.down, out RaycastHit groundHit, _distanceTillGroundHit, layerMask))
             {
@@ -143,7 +110,51 @@ public class SpiderController : MonoBehaviour
                 originalTargetPos = targetMovePos;
             }
         }
-        
+    }
+
+    private void ProcessMovement(ref Vector3 moveDirection, ref bool hasMovementInput)
+    {
+        // Process movement input - now relative to rotation
+        if (Input.GetKey(KeyCode.W))
+        {
+            moveDirection += Vector3.forward;
+            hasMovementInput = true;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            moveDirection += Vector3.back;
+            hasMovementInput = true;
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            moveDirection += Vector3.left;
+            hasMovementInput = true;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            moveDirection += Vector3.right;
+            hasMovementInput = true;
+        }
+
+        // Normalize for consistent speed in all directions
+        if (moveDirection.magnitude > 0)
+        {
+            moveDirection.Normalize();
+
+            // Convert local direction to world space based on current rotation
+            Vector3 worldMoveDirection = transform.TransformDirection(moveDirection);
+
+            // Set the target position based on rotation
+            targetMovePos += worldMoveDirection * Time.deltaTime * speed;
+
+            // Store movement direction for auto-rotation
+            movementDirection = worldMoveDirection;
+        }
+    }
+
+    private void ProcessRotation(Vector3 moveDirection, bool hasMovementInput)
+    {
         // Handle rotation input
         if (Input.GetKey(KeyCode.Q))
         {
@@ -157,7 +168,7 @@ public class SpiderController : MonoBehaviour
             targetRotation *= Quaternion.Euler(0, rotatingSpeed * Time.deltaTime, 0);
             autoRotateTowardsMovement = false; // Disable auto-rotation when manually rotating
         }
-        
+
         // Auto rotate towards movement direction if enabled and we have movement
         // This is now redundant since we're moving in the direction we're facing
         // But we'll keep it for when movement might come from other sources
@@ -165,7 +176,7 @@ public class SpiderController : MonoBehaviour
         {
             // For simplicity, we'll only enable auto-rotation when moving forward
             // This prevents the spider from flipping 180° when backing up
-            
+
             if (movementDirection.magnitude > 0.01f)
             {
                 movementDirection.y = 0; // Ignore vertical changes for rotation
@@ -173,7 +184,7 @@ public class SpiderController : MonoBehaviour
                 targetRotation = Quaternion.Euler(0, targetAngle, 0);
             }
         }
-        
+
         // Apply rotation with smoothing
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
     }
