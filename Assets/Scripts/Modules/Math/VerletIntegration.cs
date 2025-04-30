@@ -32,7 +32,7 @@ namespace Modules.Maths
                 xd = (x - xp) / T;
                 xp = x;
             }
-
+            Debug.LogError("UpdateValues VerletIntegration");
             Vector3 a = (x + k3 * xd.Value - y - k1 * yd) / k2;
 
             Vector3 newY = 2 * y - yPrev + T * T * a;

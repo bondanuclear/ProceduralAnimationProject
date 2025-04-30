@@ -42,6 +42,7 @@ public class MovementContext
         _walkParams = walkParams;
         _runParams = runParams;
         _equationSolver = equationSolver;
+        Debug.LogError($"_equationSolver: {_equationSolver.GetType().Name}");
         _spineIK = spineIK;
         _monoBehaviour = monoBehaviour;
         _spineTargetOriginalPosition = spineTarget.transform.localPosition;
@@ -56,7 +57,7 @@ public class MovementContext
     {
         _currentParams = _runParams;
         Debug.Log("SetSecondOrderParameters: " + _currentParams.f + " " + _currentParams.z + " " + _currentParams.r);
-        _equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
+        //_equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
     }
 
     private void CreateMovementTarget()
@@ -87,7 +88,7 @@ public class MovementContext
         }
         
         // Create new equation solver with new parameters
-        _equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
+        //_equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
     }
     
     // Properties

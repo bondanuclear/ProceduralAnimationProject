@@ -30,7 +30,8 @@ namespace Modules.Maths
         /// 
         public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
         {
-             Debug.Log("T is " + T);
+             //Debug.Log("T is " + T);
+             Debug.LogError("UpdateValues SemiImplicitEuler");
             if (xd == null)
             {
                 xd = (x - xp) / T;

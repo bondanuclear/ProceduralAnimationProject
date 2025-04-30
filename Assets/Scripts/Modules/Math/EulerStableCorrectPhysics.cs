@@ -36,10 +36,10 @@ namespace Modules.Maths
                 xp = x;
             }
             // якщо T занадто великий, ми розбиваємо його на менші кроки, які менше за поріг стабільності
-            Debug.Log("T is " + T);
+            //Debug.Log("T is " + T);
             int iterations = (int)Math.Ceiling(T / T_critical);
-          
-            Debug.Log("Iterations " + iterations);
+            Debug.LogError("EulerStableCorrectPhysics UpdateValues");
+            //Debug.Log("Iterations " + iterations);
             T = T / iterations;
 
             for(int i = 0; i < iterations; i++)

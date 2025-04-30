@@ -124,6 +124,9 @@ public class CharacterEquationSolverEditor : EditorWindow
             spiderController.damping = damping;
             spiderController.response = response;
             
+            // Force reinitialize the equation solver
+            spiderController.InitializeEquationSolver();
+            
             solverApplied = true;
             Debug.Log($"Applied {selectedSolverType} solver to SpiderController on {selectedCharacter.name}");
         }
@@ -137,6 +140,9 @@ public class CharacterEquationSolverEditor : EditorWindow
             movementStateMachine.frequency = frequency;
             movementStateMachine.damping = damping;
             movementStateMachine.response = response;
+            
+            // Force reinitialize the equation solver
+            movementStateMachine.InitializeEquationSolver();
             
             solverApplied = true;
             Debug.Log($"Applied {selectedSolverType} solver to MovementStateMachine on {selectedCharacter.name}");

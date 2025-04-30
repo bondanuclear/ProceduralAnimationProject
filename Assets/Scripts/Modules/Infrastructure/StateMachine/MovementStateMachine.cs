@@ -47,7 +47,7 @@ public class MovementStateMachine : StateManager<EMovementState>
             _walkSpeed,
             _runSpeed,
             (_walkF, _walkZ, _walkR),
-            (_runF, _runZ, _runR),
+            (frequency, damping, response),
             _spineTarget,
             _spineIK,
             this,
@@ -58,25 +58,25 @@ public class MovementStateMachine : StateManager<EMovementState>
         InitializeStates();
     }
     
-    private void InitializeEquationSolver()
+    public void InitializeEquationSolver()
     {
         // Create the equation solver based on the configured type
         switch (solverType)
         {
-            case Modules.Maths.EquationSolverType.EulerStable:
-                _equationSolver = new Modules.Maths.EulerStable(frequency, damping, response, transform.position);
+            case EquationSolverType.EulerStable:
+                _equationSolver = new EulerStable(frequency, damping, response, transform.position);
                 break;
-            case Modules.Maths.EquationSolverType.EulerStableCorrectPhysics:
-                _equationSolver = new Modules.Maths.EulerStableCorrectPhysics(frequency, damping, response, transform.position);
+            case EquationSolverType.EulerStableCorrectPhysics:
+                _equationSolver = new EulerStableCorrectPhysics(frequency, damping, response, transform.position);
                 break;
-            case Modules.Maths.EquationSolverType.SemiImplicitEuler:
-                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+            case EquationSolverType.SemiImplicitEuler:
+                _equationSolver = new SemiImplicitEuler(frequency, damping, response, transform.position);
                 break;
-            case Modules.Maths.EquationSolverType.VerletIntegration:
-                _equationSolver = new Modules.Maths.VerletIntegration(frequency, damping, response, transform.position);
+            case EquationSolverType.VerletIntegration:
+                _equationSolver = new VerletIntegration(frequency, damping, response, transform.position);
                 break;
             default:
-                _equationSolver = new Modules.Maths.SemiImplicitEuler(frequency, damping, response, transform.position);
+                _equationSolver = new SemiImplicitEuler(frequency, damping, response, transform.position);
                 break;
         }
         

@@ -54,13 +54,30 @@ public class SpiderController : MonoBehaviour
     
     void Awake()
     {
-        // Initialize equation solver based on the configured type
+        // Make sure parameters match the serialized fields
+        frequency = f;
+        damping = z;
+        response = r;
+    
         InitializeEquationSolver();
-        
-        // ... existing Awake code if any ...
+       
     }
     
-    private void InitializeEquationSolver()
+    void OnEnable()
+    {
+        // Make sure parameters match the serialized fields
+        frequency = f;
+        damping = z;
+        response = r;
+        
+        // Initialize equation solver if needed
+        if (_equationSolver == null)
+        {
+            InitializeEquationSolver();
+        }
+    }
+    
+    public void InitializeEquationSolver()
     {
         // Create the equation solver based on the configured type
         switch (solverType)
@@ -82,7 +99,12 @@ public class SpiderController : MonoBehaviour
                 break;
         }
         
-        Debug.Log($"Initialized {solverType} solver for {gameObject.name}");
+        // Save these values to ensure they persist
+        f = frequency;
+        z = damping;
+        r = response;
+        
+        Debug.Log($"Initialized {solverType} solver for {gameObject.name} with parameters (f={frequency}, d={damping}, r={response})");
     }
     
     private void Start() 

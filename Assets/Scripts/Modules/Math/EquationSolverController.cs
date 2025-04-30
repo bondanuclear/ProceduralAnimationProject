@@ -25,11 +25,11 @@ public class EquationSolverController : MonoBehaviour
         ApplySolverToComponents();
     }
     
-    private void Start()
-    {
-        // Apply solver on start
-        ApplySolverToComponents();
-    }
+    // private void Start()
+    // {
+    //     // Apply solver on start
+    //     ApplySolverToComponents();
+    // }
     
     /// <summary>
     /// Apply the configured equation solver to all relevant components

@@ -27,6 +27,7 @@ namespace Modules.Maths
         /// <returns></returns>
         public Vector3 UpdateValues(Vector3 x, Vector3? xd = null, float T = Mathf.Infinity)
         {
+            Debug.LogError("UpdateValues EulerStable");
             if (xd == null)
             {
                 xd = (x - xp) / T;

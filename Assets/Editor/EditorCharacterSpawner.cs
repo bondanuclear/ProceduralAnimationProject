@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using Modules.Maths;
+using UnityEditor.SceneManagement;
 
 public class EditorCharacterSpawner : EditorWindow
 {
@@ -520,18 +521,54 @@ public class EditorCharacterSpawner : EditorWindow
         GameObject character = PrefabUtility.InstantiatePrefab(prefabToSpawn) as GameObject;
         if (character != null)
         {
-            // Configure equation solver before moving the character to prevent Awake from using default values
-            ConfigureEquationSolver(character);
-            
-            // Now move the character (this shouldn't trigger Awake again)
-            character.transform.position = position;
+            Debug.LogError("Character instantiated");
+            // Register for undo
             Undo.RegisterCreatedObjectUndo(character, "Spawn Character");
+            
+            // Place the character
+            character.transform.position = position;
+            Debug.LogError("Character positioned");
+            
+            // Break prefab instance connection for independent editing
+            PrefabUtility.UnpackPrefabInstance(character, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
+            
+            // Configure equation solver settings
+            ConfigureEquationSolver(character);
             
             // Configure procedural animation rigs
             ConfigureProceduralRigs(character);
             
             // Add the EquationSolverController component for runtime editing
             AddEquationSolverController(character);
+            
+            // Apply changes to components using SerializedObject for more reliable property setting
+            var spiderController = character.GetComponent<SpiderController>();
+            if (spiderController != null)
+            {
+                SerializedObject serializedController = new SerializedObject(spiderController);
+                serializedController.FindProperty("solverType").enumValueIndex = (int)selectedEquationSolverType;
+                serializedController.FindProperty("frequency").floatValue = frequency;
+                serializedController.FindProperty("damping").floatValue = damping;
+                serializedController.FindProperty("response").floatValue = response;
+                serializedController.ApplyModifiedProperties();
+                Debug.LogError("Applied serialized properties to SpiderController");
+            }
+            
+            // Ensure changes are saved
+            EditorUtility.SetDirty(character);
+            foreach (var component in character.GetComponents<Component>())
+            {
+                if (component != null)
+                {
+                    EditorUtility.SetDirty(component);
+                }
+            }
+            
+            // Mark scene as dirty
+            if (!Application.isPlaying)
+            {
+                EditorSceneManager.MarkSceneDirty(character.scene);
+            }
             
             Debug.Log($"Spawned {selectedCharacterType} character at {position}");
             
@@ -588,11 +625,13 @@ public class EditorCharacterSpawner : EditorWindow
     {
         if (selectedCharacterType == CharacterType.Human)
         {
+            Debug.LogError("Human character ConfigureEquationSolver");
             // For human characters, configure equation solver
             ConfigureSpiderEquationSolver(character);
         }
         else if (selectedCharacterType == CharacterType.Spider)
         {
+            Debug.LogError("Spider character ConfigureEquationSolver");
             // For spider characters, configure equation solver
             ConfigureSpiderEquationSolver(character);
         }
@@ -600,12 +639,21 @@ public class EditorCharacterSpawner : EditorWindow
     
     private void ConfigureSpiderEquationSolver(GameObject spiderObject)
     {
+        Debug.LogError("ConfigureSpiderEquationSolver");
         if (spiderObject != null)
         {
+            Debug.LogError("Spider is not null");
+            // Mark the object for Undo
+            Undo.RecordObject(spiderObject, "Configure Equation Solver");
+            
             // Set solver properties directly on the SpiderController
             var spiderController = spiderObject.GetComponent<SpiderController>();
             if (spiderController != null)
             {
+                Debug.LogError("SpiderController found");
+                // Mark the component for Undo
+                Undo.RecordObject(spiderController, "Configure SpiderController Parameters");
+                
                 // Set the parameters directly instead of using reflection
                 spiderController.solverType = selectedEquationSolverType;
                 spiderController.frequency = frequency;
@@ -620,7 +668,10 @@ public class EditorCharacterSpawner : EditorWindow
                 }
                 else
                 {
-                    // In editor, we use reflection to call the method even if it's private
+                    // In editor, we need to mark this as dirty to save changes
+                    EditorUtility.SetDirty(spiderController);
+                    
+                    // Call InitializeEquationSolver
                     var method = spiderController.GetType().GetMethod("InitializeEquationSolver", 
                         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
                     if (method != null)
@@ -634,9 +685,82 @@ public class EditorCharacterSpawner : EditorWindow
             }
             
             // Also set it on the MovementStateMachine if it exists
-            var movementStateMachine = spiderObject.GetComponent<MovementStateMachine>();
+            MovementStateMachine movementStateMachine = null;
+            
+            // Try to find the component directly
+            movementStateMachine = spiderObject.GetComponent<MovementStateMachine>();
+            
+            // If not found, try looking in children including inactive ones
+            if (movementStateMachine == null)
+            {
+                movementStateMachine = spiderObject.GetComponentInChildren<MovementStateMachine>(true);
+                if (movementStateMachine != null)
+                {
+                    Debug.LogError($"Found MovementStateMachine in child: {movementStateMachine.name}");
+                }
+            }
+            
+            // If still not found, try to find the MovementRig GameObject and get the component from there
+            if (movementStateMachine == null)
+            {
+                Transform movementRig = spiderObject.transform.Find("MovementRig");
+                if (movementRig != null)
+                {
+                    Debug.LogError($"Found MovementRig GameObject: {movementRig.name}");
+                    movementStateMachine = movementRig.GetComponent<MovementStateMachine>();
+                    if (movementStateMachine == null)
+                    {
+                        // Try looking in the children of the MovementRig
+                        movementStateMachine = movementRig.GetComponentInChildren<MovementStateMachine>(true);
+                    }
+                }
+            }
+            
+            // Search all children recursively to find any potential movement state machine components
+            if (movementStateMachine == null)
+            {
+                Debug.LogError("Searching all children recursively for MovementStateMachine");
+                var transforms = spiderObject.GetComponentsInChildren<Transform>(true);
+                foreach (var transform in transforms)
+                {
+                    Debug.LogError($"Checking child object: {transform.name}");
+                    var component = transform.GetComponent<MovementStateMachine>();
+                    if (component != null)
+                    {
+                        movementStateMachine = component;
+                        Debug.LogError($"Found MovementStateMachine on: {transform.name}");
+                        break;
+                    }
+                }
+            }
+            
+            // If MovementStateMachine still not found, we'll need to check if the script exists in the project
+            if (movementStateMachine == null)
+            {
+                Debug.LogError("MovementStateMachine not found in the prefab hierarchy.");
+                
+                // Check if we should add it (only if the component exists in the project)
+                var scriptType = System.Type.GetType("MovementStateMachine");
+                if (scriptType != null)
+                {
+                    Debug.LogError("Creating MovementStateMachine component since it wasn't found");
+                    movementStateMachine = spiderObject.AddComponent(scriptType) as MovementStateMachine;
+                }
+                else
+                {
+                    Debug.LogError("MovementStateMachine script not found in the project. Skipping component initialization.");
+                }
+            }
+            
+            Debug.LogError(spiderObject.name);
             if (movementStateMachine != null)
             {
+                Debug.LogError("MovementStateMachine found");
+                Debug.LogError(movementStateMachine.name);
+             
+                // Mark the component for Undo
+                Undo.RecordObject(movementStateMachine, "Configure MovementStateMachine Parameters");
+                
                 // Set the parameters directly
                 movementStateMachine.solverType = selectedEquationSolverType;
                 movementStateMachine.frequency = frequency;
@@ -651,7 +775,11 @@ public class EditorCharacterSpawner : EditorWindow
                 }
                 else
                 {
-                    // In editor, we use reflection to call the method even if it's private
+                    Debug.LogError("In editor, we need to mark this as dirty to save changes");
+                    // In editor, we need to mark this as dirty to save changes
+                    EditorUtility.SetDirty(movementStateMachine);
+                    
+                    // Call InitializeEquationSolver
                     var method = movementStateMachine.GetType().GetMethod("InitializeEquationSolver", 
                         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
                     if (method != null)
@@ -662,6 +790,12 @@ public class EditorCharacterSpawner : EditorWindow
                 
                 Debug.Log($"Configured {selectedEquationSolverType} equation solver on MovementStateMachine with parameters " +
                     $"(f={frequency}, d={damping}, r={response})");
+            }
+            
+            // Mark scene as dirty to ensure changes are saved
+            if (!Application.isPlaying)
+            {
+                EditorSceneManager.MarkSceneDirty(spiderObject.scene);
             }
         }
     }
