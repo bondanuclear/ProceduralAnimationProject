@@ -57,7 +57,7 @@ public class MovementContext
     {
         _currentParams = _runParams;
         Debug.Log("SetSecondOrderParameters: " + _currentParams.f + " " + _currentParams.z + " " + _currentParams.r);
-        //_equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
+        
     }
 
     private void CreateMovementTarget()
@@ -75,6 +75,7 @@ public class MovementContext
     }
     
     // Change dynamics parameters based on state
+    // не використовується зараз
     public void SetStateParameters(EMovementState state)
     {
         switch (state)
@@ -88,6 +89,7 @@ public class MovementContext
         }
         
         // Create new equation solver with new parameters
+        // перезаписуємо значення параметрів
         //_equationSolver = new SemiImplicitEuler(_currentParams.f, _currentParams.z, _currentParams.r, _characterTransform.position);
     }
     

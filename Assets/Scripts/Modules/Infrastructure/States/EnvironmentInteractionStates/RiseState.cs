@@ -68,8 +68,11 @@ namespace Modules.Infrastructure.States
         private void CalculateExpectedHandRotation()
         {
             Vector3 startPos = _context.CurrentShoulderTransform.position;
+            Debug.Log("startPos: " + startPos);
             Vector3 endPos = _context.ClosestPointOnColliderFromShoulder;
+            Debug.Log("endPos: " + endPos);
             Vector3 direction = (endPos - startPos).normalized;
+            Debug.Log("direction: " + direction);
             if(Physics.Raycast(startPos, direction, out RaycastHit hit, .5f, _interactionLayerMask))
             {
                 Debug.Log("Hit: " + hit.point);

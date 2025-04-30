@@ -27,15 +27,15 @@ public class SpiderController : MonoBehaviour
     [SerializeField] private ParticleSystem jumpParticles;
     
     [Header("Parameters of the second order system: ")]
-    [SerializeField] private float f;
-    [SerializeField] private float z;
-    [SerializeField] private float r;
-    [Header("Equation Solver Configuration")]
-    public Modules.Maths.EquationSolverType solverType = Modules.Maths.EquationSolverType.SemiImplicitEuler;
     public float frequency = 5f;
     public float damping = 0.5f;
     public float response = 0.3f;
-    
+   
+    [Header("Equation Solver Configuration")]
+    public EquationSolverType solverType = EquationSolverType.SemiImplicitEuler;
+     private float f;
+    private float z;
+    private float r;
     private IEquationSolver _equationSolver;
     private Vector3 targetMovePos;
     private Vector3 resultVector;
@@ -55,27 +55,27 @@ public class SpiderController : MonoBehaviour
     void Awake()
     {
         // Make sure parameters match the serialized fields
-        frequency = f;
-        damping = z;
-        response = r;
+        f = frequency;
+        z = damping;
+        r = response;
     
         InitializeEquationSolver();
        
     }
     
-    void OnEnable()
-    {
-        // Make sure parameters match the serialized fields
-        frequency = f;
-        damping = z;
-        response = r;
+    // void OnEnable()
+    // {
+    //     // Make sure parameters match the serialized fields
+    //     frequency = f;
+    //     damping = z;
+    //     response = r;
         
-        // Initialize equation solver if needed
-        if (_equationSolver == null)
-        {
-            InitializeEquationSolver();
-        }
-    }
+    //     // Initialize equation solver if needed
+    //     if (_equationSolver == null)
+    //     {
+    //         InitializeEquationSolver();
+    //     }
+    // }
     
     public void InitializeEquationSolver()
     {

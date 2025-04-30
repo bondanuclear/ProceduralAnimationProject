@@ -21,14 +21,10 @@ public class MovementStateMachine : StateManager<EMovementState>
     
     private IEquationSolver _equationSolver;
     [Header("Second Order Parameters - Walk")]
-    [SerializeField] private float _walkF = 1f;
-    [SerializeField] private float _walkZ = 0.7f;
-    [SerializeField] private float _walkR = 0.5f;
+    private float _walkF = 1f;
+    private float _walkZ = 0.7f;
+    private float _walkR = 0.5f;
     
-    [Header("Second Order Parameters - Run")]
-    [SerializeField] private float _runF = 1.5f;
-    [SerializeField] private float _runZ = 0.8f;
-    [SerializeField] private float _runR = 0.6f;
     
     [Header("Spine Target")]
     [SerializeField] private Transform _spineTarget;
