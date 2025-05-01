@@ -12,9 +12,16 @@ public class Helper : MonoBehaviour
     [SerializeField] float r;
     private IEquationSolver instance;
     private void Start() {
-        instance = new SemiImplicitEuler(f, z, r, transform.position);
+        instance = new EulerStable(f, z, r, transform.position);
+    }
+    private void Update() {
+        if(Input.GetKeyDown(KeyCode.Space)) {
+            Debug.Log("Space pressed, creating new instance with " + f + " " + z + " " + r + " " + transform.position);
+            instance = new EulerStable(f, z, r, transform.position);
+        }
     }
     private void FixedUpdate() {
-        target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime );
+        
+            target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime );
     }
 }
