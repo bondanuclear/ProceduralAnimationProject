@@ -1555,16 +1555,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1427588325}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f71e90cca016487c93123ad13dccbcd, type: 3}
+  m_Script: {fileID: 11500000, guid: b78ec327eb96a4098af7ac8d2dc5b25a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 2
-  damping: 0.507
-  response: 1
-  target: {fileID: 1602563803}
-  resolution: 256
-  simulationTime: 2
+  f: 4.5
+  z: 0.35
+  r: 1
+  resolution: 100
+  duration: 2
   solverType: 2
+  graphRect:
+    serializedVersion: 2
+    x: 18
+    y: 287
+    width: 577.5
+    height: 140
 --- !u!1 &1512430400
 GameObject:
   m_ObjectHideFlags: 0

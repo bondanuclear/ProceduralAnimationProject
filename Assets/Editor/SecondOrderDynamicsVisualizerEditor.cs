@@ -88,36 +88,97 @@ public class SecondOrderDynamicsVisualizerEditor : Editor
         
         Handles.BeginGUI();
         
-        // Draw centerline
-        Handles.color = Color.green;
-        float centerY = rect.y + rect.height / 2;
-        Handles.DrawLine(
-            new Vector3(rect.x, centerY), 
-            new Vector3(rect.x + rect.width, centerY)
-        );
-        
         // Get visualization data
         List<float> data = visualizer.GetSimulationData();
         
-        // Draw the curve
+        // Find min/max for scaling
+        float min = float.MaxValue;
+        float max = float.MinValue;
+        
         if (data.Count >= 2)
         {
-            // Find min/max for scaling
-            float min = float.MaxValue;
-            float max = float.MinValue;
-            
             foreach (float value in data)
             {
                 min = Mathf.Min(min, value);
                 max = Mathf.Max(max, value);
             }
-            
-            // Ensure we have a reasonable range
-            float range = Mathf.Max(0.01f, max - min);
-            
+        }
+        else
+        {
+            min = 0;
+            max = 1;
+        }
+        
+        // Ensure we have a reasonable range
+        float range = Mathf.Max(0.01f, max - min);
+        
+        // Calculate where 0 and 1 will be on the graph
+        float zeroY = rect.yMax - ((0 - min) / range) * rect.height;
+        float oneY = rect.yMax - ((1 - min) / range) * rect.height;
+        
+        // Draw X axis (time)
+        Handles.color = Color.white;
+        Handles.DrawLine(
+            new Vector3(rect.x, rect.yMax), 
+            new Vector3(rect.x + rect.width, rect.yMax),
+            2
+        );
+        
+        // Draw Y axis
+        Handles.DrawLine(
+            new Vector3(rect.x, rect.y), 
+            new Vector3(rect.x, rect.yMax),
+            2
+        );
+        
+        // // Draw zero line (reference)
+        // Handles.color = Color.white;
+        // Handles.DrawLine(
+        //     new Vector3(rect.x, zeroY), 
+        //     new Vector3(rect.x + rect.width, zeroY),
+        //     2
+        // );
+        
+        // Draw equilibrium line (target position = 1)
+        Handles.color = Color.green;
+        Handles.DrawLine(
+            new Vector3(rect.x, oneY), 
+            new Vector3(rect.x + rect.width, oneY)
+        );
+        
+        // Draw labels
+        GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
+        labelStyle.normal.textColor = Color.white;
+        labelStyle.fontSize = 10;
+        
+        // Y-axis labels
+        GUI.Label(new Rect(rect.x - 15, zeroY - 8, 20, 16), "0", labelStyle);
+        GUI.Label(new Rect(rect.x - 15, oneY - 8, 20, 16), "1", labelStyle);
+        
+        // X-axis labels
+        //GUI.Label(new Rect(rect.x - 5, rect.yMax, 20, 16), "0", labelStyle);
+        //GUI.Label(new Rect(rect.x + rect.width - 15, rect.yMax, 20, 16), "2", labelStyle);
+        
+        // Draw the curve
+        if (data.Count >= 2)
+        {
             // Draw line segments
             Handles.color = Color.cyan;
             
+            // Create points array for the polyline
+            Vector3[] points = new Vector3[data.Count];
+            for (int i = 0; i < data.Count; i++)
+            {
+                float x = rect.x + (i * rect.width / (data.Count - 1));
+                float y = rect.yMax - ((data[i] - min) / range) * rect.height;
+                points[i] = new Vector3(x, y, 0);
+            }
+            
+            // Draw a thicker line using DrawAAPolyLine
+            Handles.DrawAAPolyLine(2.0f, points);
+            
+            // Old individual line drawing approach
+            /*
             for (int i = 1; i < data.Count; i++)
             {
                 float x0 = rect.x + ((i - 1) * rect.width / (data.Count - 1));
@@ -128,6 +189,7 @@ public class SecondOrderDynamicsVisualizerEditor : Editor
                 
                 Handles.DrawLine(new Vector3(x0, y0), new Vector3(x1, y1));
             }
+            */
         }
         
         Handles.EndGUI();
