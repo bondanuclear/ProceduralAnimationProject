@@ -1111,6 +1111,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2820123499915744414, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+      propertyPath: response
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2820123499915744414, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+      propertyPath: frequency
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3893879661402882019, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
       propertyPath: m_Name
       value: BananaManProcedural
@@ -1153,6 +1161,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4568071842543576389, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8169484627514063933, guid: 682996584da8548cc955f38fe8a7ac9f, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

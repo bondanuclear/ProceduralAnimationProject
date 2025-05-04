@@ -12,10 +12,13 @@ public class SecondOrderDynamicsVisualizer : MonoBehaviour
 
     [Header("Visualization Settings")]
     public int resolution = 100;
-    public float duration = 2f;
+    public float duration = 6f;
     
     [Header("Solver Selection")]
     public EquationSolverType solverType = EquationSolverType.SemiImplicitEuler;
+    
+    [Header("Simulation Mode")]
+    public bool useFixedDeltaTime = false;  // Toggle to use Time.fixedDeltaTime
     
     private List<float> simulationData = new List<float>();
     private bool needsRecalculation = true;
@@ -58,21 +61,24 @@ public class SecondOrderDynamicsVisualizer : MonoBehaviour
                 break;
         }
 
-        // Initial position (x=0)
-        Vector3 currentPos = Vector3.zero;
-        Vector3 previousPos = Vector3.zero;
+        float initialX = r < 0 ? r / (1 - r) : 0;
+        Vector3 currentPos = new Vector3(initialX, 0, 0);
+        Vector3 previousPos = currentPos;
         
         // Target position (x=1)
         Vector3 targetPos = Vector3.right;
         
-        // Time step
-        float dt = duration / resolution;
+        // Get the time step based on the selected mode
+        float dt = useFixedDeltaTime ? Time.fixedDeltaTime : duration / resolution;
+        
+        // Calculate number of steps based on the time step
+        int steps = useFixedDeltaTime ? Mathf.FloorToInt(duration / dt) : resolution;
         
         // Add initial point
         simulationData.Add(0);
         
         // Run simulation
-        for (int i = 1; i <= resolution; i++)
+        for (int i = 1; i <= steps; i++)
         {
             // Calculate velocity (for solvers that use it)
             Vector3 velocity = (currentPos - previousPos) / dt;

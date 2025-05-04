@@ -23,11 +23,17 @@ public class SecondOrderDynamicsVisualizerEditor : Editor
         
         EditorGUILayout.Space(5);
         
-        GUILayout.Label("Update Mode", EditorStyles.boldLabel);
+        GUILayout.Label("Simulation Settings", EditorStyles.boldLabel);
         
-        // Update mode dropdown (purely visual, as we don't use it here)
-        string[] updateModes = { "Update" };
-        EditorGUILayout.Popup(0, updateModes);
+        // Time step mode selection
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("useFixedDeltaTime"), new GUIContent("Use Fixed Delta Time"));
+        
+        // Show time step information
+        float timeStep = visualizer.useFixedDeltaTime ? Time.fixedDeltaTime : visualizer.duration / visualizer.resolution;
+        int steps = visualizer.useFixedDeltaTime ? Mathf.FloorToInt(visualizer.duration / Time.fixedDeltaTime) : visualizer.resolution;
+        
+        EditorGUILayout.LabelField("Time Step: " + timeStep.ToString("F5") + "s", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField("Simulation Steps: " + steps, EditorStyles.miniLabel);
         
         // Parameters with sliders
         EditorGUILayout.Space(5);

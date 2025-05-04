@@ -22,6 +22,6 @@ public class Helper : MonoBehaviour
     }
     private void FixedUpdate() {
         
-            target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime );
+            target.transform.position = instance.UpdateValues(transform.position, null, Time.fixedDeltaTime);
     }
 }

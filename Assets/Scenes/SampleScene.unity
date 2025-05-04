@@ -458,9 +458,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1602563803}
-  f: 2
-  z: 0.2
-  r: -3
+  f: 1
+  z: 0.24
+  r: -1
 --- !u!1 &550416319
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,7 +949,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &918004696
 Transform:
   m_ObjectHideFlags: 0
@@ -1558,16 +1558,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b78ec327eb96a4098af7ac8d2dc5b25a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  f: 10
-  z: 0.8
-  r: -1
+  f: 1
+  z: 0.5
+  r: 2
   resolution: 100
   duration: 2
-  solverType: 0
+  solverType: 3
+  useFixedDeltaTime: 0
   graphRect:
     serializedVersion: 2
     x: 18
-    y: 287
+    y: 354
     width: 577.5
     height: 140
 --- !u!1 &1512430400
@@ -2206,8 +2207,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
+      propertyPath: damping
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: frequency
-      value: 0.4
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2097972959, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
+      propertyPath: solverType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5826984832034546386, guid: a207e390f5a775e4c9022eae6e56c58d, type: 3}
       propertyPath: m_Name
