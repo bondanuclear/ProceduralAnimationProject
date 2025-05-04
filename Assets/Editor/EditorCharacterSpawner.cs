@@ -675,13 +675,90 @@ public class EditorCharacterSpawner : EditorWindow
         {
             Debug.LogError("Human character ConfigureEquationSolver");
             // For human characters, configure equation solver
-            ConfigureSpiderEquationSolver(character);
+            ConfigureHumanEquationSolver(character);
         }
         else if (selectedCharacterType == CharacterType.Spider)
         {
             Debug.LogError("Spider character ConfigureEquationSolver");
             // For spider characters, configure equation solver
             ConfigureSpiderEquationSolver(character);
+        }
+    }
+    
+    private void ConfigureHumanEquationSolver(GameObject humanObject)
+    {
+        Debug.LogError("ConfigureHumanEquationSolver");
+        if (humanObject != null)
+        {
+            Debug.LogError("Human is not null");
+            // Mark the object for Undo
+            Undo.RecordObject(humanObject, "Configure Human Equation Solver");
+            
+            // Find MovementStateMachine in the human character
+            MovementStateMachine movementStateMachine = null;
+            
+            // Try to find the component directly
+            movementStateMachine = humanObject.GetComponent<MovementStateMachine>();
+            
+            // If not found, try looking in children including inactive ones
+            if (movementStateMachine == null)
+            {
+                movementStateMachine = humanObject.GetComponentInChildren<MovementStateMachine>(true);
+                if (movementStateMachine != null)
+                {
+                    Debug.LogError($"Found MovementStateMachine in child: {movementStateMachine.name}");
+                }
+            }
+            
+            // If found, configure it
+            if (movementStateMachine != null)
+            {
+                // Mark the component for Undo
+                Undo.RecordObject(movementStateMachine, "Configure MovementStateMachine Parameters");
+                
+                // Set properties
+                movementStateMachine.frequency = frequency;
+                movementStateMachine.damping = damping;
+                movementStateMachine.response = response;
+                
+                // Set solver type
+                var solverTypeField = movementStateMachine.GetType().GetField("solverType");
+                if (solverTypeField != null)
+                {
+                    // Convert enum to int value first
+                    int enumValue = (int)selectedEquationSolverType;
+                    
+                    // Create enum value of the target type
+                    object enumObject = Enum.ToObject(solverTypeField.FieldType, enumValue);
+                    
+                    // Set the field value
+                    solverTypeField.SetValue(movementStateMachine, enumObject);
+                    Debug.LogError($"Set movementStateMachine solverType to {enumValue} via reflection");
+                }
+                
+                // Try to invoke initialize method if it exists
+                var initMethod = movementStateMachine.GetType().GetMethod("InitializeEquationSolver", 
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                if (initMethod != null)
+                {
+                    initMethod.Invoke(movementStateMachine, null);
+                    Debug.LogError("Called InitializeEquationSolver on MovementStateMachine");
+                }
+                
+                EditorUtility.SetDirty(movementStateMachine);
+                Debug.Log($"Configured equation solver on MovementStateMachine with parameters " +
+                    $"(f={frequency}, d={damping}, r={response})");
+            }
+            else
+            {
+                Debug.LogError("Could not find MovementStateMachine component on human character");
+            }
+            
+            // Mark scene as dirty to ensure changes are saved
+            if (!Application.isPlaying)
+            {
+                EditorSceneManager.MarkSceneDirty(humanObject.scene);
+            }
         }
     }
     
